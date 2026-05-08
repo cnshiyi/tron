@@ -1,5 +1,7 @@
+from datetime import timedelta
 from decimal import Decimal
 
+from django.utils import timezone
 from django.db.models import Count, Sum
 from django.db.models.functions import Coalesce, TruncDate
 from rest_framework.response import Response
@@ -28,6 +30,17 @@ def sum_field(queryset, field):
 
 def status_counts(queryset, field="status"):
     return list(queryset.values(field).annotate(count=Count("id")).order_by(field))
+
+
+def apply_report_filters(queryset, request, bot_field="bot_id"):
+    bot_id = request.query_params.get("bot_id")
+    days = int(request.query_params.get("days") or 14)
+    days = max(1, min(days, 365))
+    since = timezone.now() - timedelta(days=days)
+    queryset = queryset.filter(created_at__gte=since)
+    if bot_id and bot_field:
+        queryset = queryset.filter(**{bot_field: bot_id})
+    return queryset, days, since
 
 
 def daily_amount(queryset, amount_field, days=14):
@@ -65,44 +78,57 @@ class DashboardView(APIView):
 
 class ReportOverviewView(APIView):
     def get(self, request):
-        exchange_success = ExchangeOrder.objects.filter(status__in=["sent", "paid"])
-        energy_success = EnergyOrder.objects.filter(status="success")
-        member_success = MemberOrder.objects.filter(status__in=["paid", "activated"])
-        withdrawal_paid = Withdrawal.objects.filter(status="paid")
+        exchange_orders, days, since = apply_report_filters(ExchangeOrder.objects.all(), request)
+        exchange_records, _, _ = apply_report_filters(ExchangeRecord.objects.all(), request)
+        energy_orders, _, _ = apply_report_filters(EnergyOrder.objects.all(), request)
+        energy_records, _, _ = apply_report_filters(EnergyRecord.objects.all(), request)
+        member_orders, _, _ = apply_report_filters(MemberOrder.objects.all(), request, bot_field=None)
+        member_recharges, _, _ = apply_report_filters(MemberRecharge.objects.all(), request)
+        member_commissions, _, _ = apply_report_filters(MemberCommission.objects.all(), request)
+        withdrawals, _, _ = apply_report_filters(Withdrawal.objects.all(), request, bot_field=None)
+        running_water, _, _ = apply_report_filters(RunningWater.objects.all(), request)
+        users = TgUser.objects.filter(created_at__gte=since)
+        if request.query_params.get("bot_id"):
+            users = users.filter(bot_id=request.query_params["bot_id"])
+        exchange_success = exchange_orders.filter(status__in=["sent", "paid"])
+        energy_success = energy_orders.filter(status="success")
+        member_success = member_orders.filter(status__in=["paid", "activated"])
+        withdrawal_paid = withdrawals.filter(status="paid")
         return Response({
+            "filters": {"days": days, "bot_id": request.query_params.get("bot_id", ""), "since": since.isoformat()},
             "summary": {
                 "users": TgUser.objects.count(),
-                "new_users": TgUser.objects.order_by("-id").count(),
+                "new_users": users.count(),
                 "bots": Bot.objects.count(),
                 "groups": BotGroup.objects.count(),
-                "exchange_order_count": ExchangeOrder.objects.count(),
+                "exchange_order_count": exchange_orders.count(),
                 "exchange_amount": sum_field(exchange_success, "amount"),
                 "exchange_return_amount": sum_field(exchange_success, "return_amount"),
                 "exchange_profit_usdt": sum_field(exchange_success, "profit_usdt"),
-                "energy_order_count": EnergyOrder.objects.count(),
+                "energy_order_count": energy_orders.count(),
                 "energy_trx_amount": sum_field(energy_success, "trx_amount"),
                 "energy_usdt_amount": sum_field(energy_success, "usdt_amount"),
-                "member_order_count": MemberOrder.objects.count(),
+                "member_order_count": member_orders.count(),
                 "member_amount": sum_field(member_success, "amount"),
-                "member_recharge_amount": sum_field(MemberRecharge.objects.filter(status__in=["paid", "success"]), "amount"),
-                "commission_amount": sum_field(MemberCommission.objects.filter(status__in=["paid", "settled"]), "amount"),
+                "member_recharge_amount": sum_field(member_recharges.filter(status__in=["paid", "success"]), "amount"),
+                "commission_amount": sum_field(member_commissions.filter(status__in=["paid", "settled"]), "amount"),
                 "withdrawal_paid_amount": sum_field(withdrawal_paid, "amount"),
-                "running_water_amount": sum_field(RunningWater.objects.all(), "amount"),
+                "running_water_amount": sum_field(running_water, "amount"),
             },
             "status": {
-                "exchange_orders": status_counts(ExchangeOrder.objects.all()),
-                "exchange_records": status_counts(ExchangeRecord.objects.all()),
-                "energy_orders": status_counts(EnergyOrder.objects.all()),
-                "energy_records": status_counts(EnergyRecord.objects.all()),
-                "member_orders": status_counts(MemberOrder.objects.all()),
-                "member_recharges": status_counts(MemberRecharge.objects.all()),
-                "withdrawals": status_counts(Withdrawal.objects.all()),
+                "exchange_orders": status_counts(exchange_orders),
+                "exchange_records": status_counts(exchange_records),
+                "energy_orders": status_counts(energy_orders),
+                "energy_records": status_counts(energy_records),
+                "member_orders": status_counts(member_orders),
+                "member_recharges": status_counts(member_recharges),
+                "withdrawals": status_counts(withdrawals),
             },
             "daily": {
-                "exchange": daily_amount(ExchangeOrder.objects.all(), "amount"),
-                "energy": daily_amount(EnergyOrder.objects.all(), "trx_amount"),
-                "member": daily_amount(MemberOrder.objects.all(), "amount"),
-                "withdrawal": daily_amount(Withdrawal.objects.all(), "amount"),
+                "exchange": daily_amount(exchange_orders, "amount", days),
+                "energy": daily_amount(energy_orders, "trx_amount", days),
+                "member": daily_amount(member_orders, "amount", days),
+                "withdrawal": daily_amount(withdrawals, "amount", days),
             },
-            "tokens": list(RunningWater.objects.values("token_type").annotate(count=Count("id"), amount=Coalesce(Sum("amount"), Decimal("0"))).order_by("token_type")),
+            "tokens": list(running_water.values("token_type").annotate(count=Count("id"), amount=Coalesce(Sum("amount"), Decimal("0"))).order_by("token_type")),
         })
