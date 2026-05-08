@@ -167,6 +167,11 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '会员订单', endpoint: '/membership/orders', description: '会员购买和开通记录',
     columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '目标用户', dataIndex: 'target_user_id' }, { title: '商品ID', dataIndex: 'goods' }, { title: '金额', dataIndex: 'amount' }, { title: '状态', dataIndex: 'status' }],
     fields: [{ label: '订单号', name: 'order_no' }, { label: '用户ID', name: 'user_id' }, { label: '目标用户ID', name: 'target_user_id' }, { label: '商品ID', name: 'goods', type: 'number' }, { label: '支付类型', name: 'pay_type' }, { label: '金额', name: 'amount', type: 'number' }, { label: '交易Hash', name: 'txid' }, { label: '状态', name: 'status' }],
+    actions: [
+      { name: 'markPaid', label: '已支付', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入支付 Hash，可留空' },
+      { name: 'activate', label: '开通权益', path: 'activate', confirm: '确认开通会员权益并生成分佣？' },
+      { name: 'cancel', label: '取消', path: 'cancel', danger: true, confirm: '确认取消订单？' },
+    ],
   },
   balances: {
     title: '用户余额', endpoint: '/finance/balances', description: 'TRX、USDT、积分余额',
@@ -241,6 +246,9 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '会员充值', endpoint: '/membership/recharges', description: '会员/余额充值记录',
     columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }, { title: 'Hash', dataIndex: 'txid' }],
     fields: [{ label: '订单号', name: 'order_no' }, { label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: 'Hash', name: 'txid' }, { label: '状态', name: 'status' }],
+    actions: [
+      { name: 'markPaid', label: '确认到账', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入充值 Hash，可留空' },
+    ],
   },
   memberActivities: {
     title: '会员活动', endpoint: '/membership/activities', description: '充值赠送、会员活动、奖励规则',
@@ -251,6 +259,9 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '会员佣金', endpoint: '/membership/commissions', description: '邀请/会员分佣记录',
     columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '邀请人', dataIndex: 'inviter_id' }, { title: '订单号', dataIndex: 'source_order_no' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }],
     fields: [{ label: '用户ID', name: 'user_id' }, { label: '邀请人ID', name: 'inviter_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '来源订单', name: 'source_order_no' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '状态', name: 'status' }],
+    actions: [
+      { name: 'settle', label: '结算佣金', path: 'settle', payload: { reviewed_by: 'admin' }, confirm: '确认把佣金结算到邀请人余额？' },
+    ],
   },
   energyHourlyTimes: {
     title: '能量时长配置', endpoint: '/energy/hourly-times', description: '闪租时长入口配置',

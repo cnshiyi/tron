@@ -25,3 +25,10 @@ class MemberCommissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberCommission
         fields = "__all__"
+
+
+class MemberTxidSerializer(serializers.Serializer):
+    txid = serializers.CharField(required=False, allow_blank=True, default="")
+
+class MemberCommissionSettleSerializer(serializers.Serializer):
+    reviewed_by = serializers.CharField(required=False, allow_blank=True, default="admin")
