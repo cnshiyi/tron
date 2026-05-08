@@ -14,12 +14,32 @@
 
 ## 本地启动
 
+默认开发端口已改为避免冲突：
+
+- 后端：http://127.0.0.1:18001
+- 前端：http://127.0.0.1:15666
+
+后端一键启动：
+
+```bash
+python3 start_backend.py
+```
+
+macOS 也可以直接双击根目录的 `start_backend.command`。
+
+手动启动：
+
 ```bash
 uv sync
 uv run python manage.py migrate
-uv run python manage.py createsuperuser
-uv run python manage.py runserver 0.0.0.0:8000
+uv run python manage.py runserver 127.0.0.1:18001
 ```
+
+默认后台登录：
+
+- 账号：admin
+- 密码：123456
+- Google 验证码：123456
 
 前端在 `frontend/`，来自 `https://github.com/vbenjs/vue-vben-admin`，后续在此目录内二次开发对接 `/api/`。
 

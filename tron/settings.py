@@ -9,6 +9,10 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-dev-only-change-me"
 DEBUG = os.getenv("DJANGO_DEBUG", "1") == "1"
 ALLOWED_HOSTS = [h for h in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h]
 
+DEV_LOGIN_USERNAME = os.getenv("DEV_LOGIN_USERNAME", "admin")
+DEV_LOGIN_PASSWORD = os.getenv("DEV_LOGIN_PASSWORD", "123456")
+DEV_LOGIN_GOOGLE_CODE = os.getenv("DEV_LOGIN_GOOGLE_CODE", "123456")
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

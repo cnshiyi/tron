@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -6,6 +7,17 @@ from rest_framework.response import Response
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+    google_code = request.data.get("google_code") or request.data.get("googleCode")
+
+    if (
+        username != settings.DEV_LOGIN_USERNAME
+        or password != settings.DEV_LOGIN_PASSWORD
+        or google_code != settings.DEV_LOGIN_GOOGLE_CODE
+    ):
+        return Response({"code": 401, "data": None, "message": "账号、密码或 Google 验证码错误"}, status=401)
+
     return Response({"code": 0, "data": {"accessToken": "dev-token"}, "message": "ok"})
 
 
