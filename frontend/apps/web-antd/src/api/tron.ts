@@ -196,6 +196,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       { name: 'approve', label: '通过', path: 'approve', payload: { reviewed_by: 'admin' }, confirm: '确认审核通过？' },
       { name: 'reject', label: '拒绝', path: 'reject', danger: true, payload: { reviewed_by: 'admin' }, confirm: '确认拒绝提现？' },
       { name: 'markPaid', label: '已打款', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入打款交易 Hash', payload: { reviewed_by: 'admin' } },
+      { name: 'payout', label: '打款演练', path: 'payout', payload: { dry_run: true, reviewed_by: 'admin' }, confirm: '确认执行提现打款演练？不会真实转账。' },
     ],
   },
   users: {
