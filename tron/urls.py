@@ -3,7 +3,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from accounts.auth_views import codes, login, logout, refresh, user_info
-from accounts.views import DashboardView
+from accounts.views import DashboardView, ReportOverviewView
 from bots.views import BotGroupViewSet, BotViewSet, PromotionViewSet, telegram_webhook
 from wallet.views import AddressViewSet, ChainTransactionViewSet, ListenAddressViewSet, TransactionProbeView
 from exchange.views import ExchangeBlacklistViewSet, ExchangeConfigViewSet, ExchangeOrderViewSet, ExchangeRecordViewSet
@@ -77,6 +77,7 @@ urlpatterns = [
     path("api/auth/codes", codes, name="auth-codes"),
     path("api/user/info", user_info, name="user-info"),
     path("api/dashboard/", DashboardView.as_view(), name="dashboard"),
+    path("api/reports/overview/", ReportOverviewView.as_view(), name="reports-overview"),
     path("api/wallet/probe/<str:address>/", TransactionProbeView.as_view(), name="wallet-probe"),
     path("api/energy/callback/", EnergyCallbackView.as_view(), name="energy-callback"),
     path("api/telegram/webhook/<str:bot_id>/", telegram_webhook, name="telegram-webhook"),

@@ -37,6 +37,10 @@ export function getDashboard() {
   return request<Record<string, number>>('/dashboard/');
 }
 
+export function getReportOverview() {
+  return request<Record<string, any>>('/reports/overview/');
+}
+
 export async function listResource<T = Record<string, any>>(endpoint: string, params: Record<string, any> = {}) {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
