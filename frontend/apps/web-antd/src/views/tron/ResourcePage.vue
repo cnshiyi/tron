@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Button, Card, Form, FormItem, Input, InputNumber, Modal, Popconfirm, Space, Switch, Table, Textarea, message } from 'ant-design-vue';
-import { bulkCreateBots, createResource, deleteResource, listResource, resourceConfigs, updateResource } from '#/api/tron';
+import { actionResource, bulkCreateBots, createResource, deleteResource, listResource, resourceConfigs, updateResource } from '#/api/tron';
 
 const props = defineProps<{ key?: string }>();
 const route = useRoute();
@@ -23,7 +23,7 @@ const bulkForm = reactive({ content: '', default_owner_user_id: '', webhook_enab
 
 const columns = computed(() => [
   ...config.value.columns.map((col) => ({ ...col, ellipsis: col.ellipsis ?? true })),
-  { title: '操作', key: 'action', fixed: 'right', width: 150 },
+  { title: '操作', key: 'action', fixed: 'right', width: config.value.actions?.length ? 360 : 150 },
 ]);
 
 function resetForm(record: Record<string, any> = {}) {
@@ -72,6 +72,23 @@ async function remove(record: Record<string, any>) {
   message.success('已删除');
   await load();
 }
+
+async function runCustomAction(action: Record<string, any>, record: Record<string, any>) {
+  if (action.confirm && !window.confirm(action.confirm)) return;
+  const payload = { ...(action.payload || {}) };
+  if (action.promptField) {
+    const value = window.prompt(action.promptLabel || '请输入');
+    if (!value) return;
+    payload[action.promptField] = value;
+  }
+  try {
+    await actionResource(config.value.endpoint, record.id, action.path, payload);
+    message.success('操作成功');
+    await load();
+  } catch (e: any) {
+    message.error(e.message || String(e));
+  }
+}
 async function saveBulkBots() {
   bulkSaving.value = true;
   try {
@@ -117,6 +134,14 @@ onMounted(load);
           <template v-if="column.key === 'action'">
             <Space>
               <Button size="small" type="link" @click="edit(record)">编辑</Button>
+              <Button
+                v-for="item in config.actions || []"
+                :key="item.name"
+                size="small"
+                :danger="item.danger"
+                type="link"
+                @click="runCustomAction(item, record)"
+              >{{ item.label }}</Button>
               <Popconfirm title="确定删除？" @confirm="remove(record)">
                 <Button size="small" danger type="link">删除</Button>
               </Popconfirm>

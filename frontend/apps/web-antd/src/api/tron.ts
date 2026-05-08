@@ -13,6 +13,7 @@ export interface ResourceConfig {
   description?: string;
   columns: Array<{ dataIndex: string; title: string; ellipsis?: boolean }>;
   fields: Array<{ name: string; label: string; type?: 'boolean' | 'number' | 'textarea' | 'text' }>;
+  actions?: Array<{ name: string; label: string; path: string; danger?: boolean; confirm?: string; promptField?: string; promptLabel?: string; payload?: Record<string, any> }>;
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -57,6 +58,10 @@ export function updateResource(endpoint: string, id: string | number, data: Reco
 
 export function deleteResource(endpoint: string, id: string | number) {
   return request(`${endpoint}/${id}/`, { method: 'DELETE' });
+}
+
+export function actionResource(endpoint: string, id: string | number, path: string, data: Record<string, any> = {}) {
+  return request(`${endpoint}/${id}/${path}/`, { method: 'POST', body: JSON.stringify(data) });
 }
 
 export function bulkCreateBots(data: {
@@ -111,6 +116,12 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '兑换订单', endpoint: '/exchange/orders', description: 'TRX/USDT 兑换订单和出款状态',
     columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '地址', dataIndex: 'address' }, { title: '金额', dataIndex: 'amount' }, { title: '返还金额', dataIndex: 'return_amount' }, { title: '类型', dataIndex: 'type' }, { title: '状态', dataIndex: 'status' }, { title: '利润USDT', dataIndex: 'profit_usdt' }],
     fields: [{ label: '订单号', name: 'order_no' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户ID', name: 'user_id' }, { label: '地址', name: 'address' }, { label: '金额', name: 'amount', type: 'number' }, { label: '返还金额', name: 'return_amount', type: 'number' }, { label: '类型', name: 'type' }, { label: '状态', name: 'status' }, { label: '支付Hash', name: 'pay_txid' }, { label: '出款Hash', name: 'payout_txid' }, { label: '利润USDT', name: 'profit_usdt', type: 'number' }],
+    actions: [
+      { name: 'markPaid', label: '已支付', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入支付 Hash' },
+      { name: 'markSent', label: '已出款', path: 'mark-sent', promptField: 'txid', promptLabel: '请输入出款 Hash' },
+      { name: 'fail', label: '失败', path: 'fail', danger: true, confirm: '确认标记失败？' },
+      { name: 'cancel', label: '取消', path: 'cancel', danger: true, confirm: '确认取消订单？' },
+    ],
   },
   exchangeBlacklist: {
     title: '兑换黑名单', endpoint: '/exchange/blacklist', description: '禁止兑换地址',
@@ -126,6 +137,12 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '能量订单', endpoint: '/energy/orders', description: '能量闪租/代理委托订单',
     columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '接收地址', dataIndex: 'receiver_address' }, { title: '能量', dataIndex: 'energy_amount' }, { title: 'TRX', dataIndex: 'trx_amount' }, { title: 'USDT', dataIndex: 'usdt_amount' }, { title: '状态', dataIndex: 'status' }],
     fields: [{ label: '订单号', name: 'order_no' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户ID', name: 'user_id' }, { label: '接收地址', name: 'receiver_address' }, { label: '套餐ID', name: 'plan', type: 'number' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: 'TRX金额', name: 'trx_amount', type: 'number' }, { label: 'USDT金额', name: 'usdt_amount', type: 'number' }, { label: '支付方式', name: 'pay_type' }, { label: '状态', name: 'status' }, { label: '支付Hash', name: 'pay_txid' }, { label: '能量Hash', name: 'energy_txid' }, { label: '平台订单ID', name: 'platform_order_id' }],
+    actions: [
+      { name: 'markPaid', label: '已支付', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入支付 Hash' },
+      { name: 'delegating', label: '委托中', path: 'delegating', confirm: '确认标记委托中？' },
+      { name: 'success', label: '成功', path: 'success', promptField: 'txid', promptLabel: '请输入能量交易 Hash' },
+      { name: 'fail', label: '失败', path: 'fail', danger: true, confirm: '确认标记失败？' },
+    ],
   },
   memberGoods: {
     title: '会员商品', endpoint: '/membership/goods', description: '会员套餐、费率区间',
@@ -141,6 +158,10 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '用户余额', endpoint: '/finance/balances', description: 'TRX、USDT、积分余额',
     columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: 'TRX', dataIndex: 'trx' }, { title: 'USDT', dataIndex: 'usdt' }, { title: '积分', dataIndex: 'integral' }],
     fields: [{ label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: 'TRX', name: 'trx', type: 'number' }, { label: 'USDT', name: 'usdt', type: 'number' }, { label: '积分', name: 'integral', type: 'number' }],
+    actions: [
+      { name: 'addUsdt', label: '+USDT', path: 'adjust', payload: { token_type: 'usdt', amount: '1', business_type: 'manual_add_usdt' }, confirm: '确认给该用户增加 1 USDT？' },
+      { name: 'subUsdt', label: '-USDT', path: 'adjust', danger: true, payload: { token_type: 'usdt', amount: '-1', business_type: 'manual_sub_usdt' }, confirm: '确认扣减该用户 1 USDT？' },
+    ],
   },
   runningWater: {
     title: '资金流水', endpoint: '/finance/running-water', description: '充值、兑换、能量、会员、提现流水',
@@ -151,11 +172,22 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '提现审核', endpoint: '/finance/withdrawals', description: '用户提现审批和打款',
     columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '地址', dataIndex: 'address' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }, { title: 'Hash', dataIndex: 'txid' }],
     fields: [{ label: '用户ID', name: 'user_id' }, { label: '地址', name: 'address' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '状态', name: 'status' }, { label: '交易Hash', name: 'txid' }, { label: '审核人', name: 'reviewed_by' }],
+    actions: [
+      { name: 'approve', label: '通过', path: 'approve', payload: { reviewed_by: 'admin' }, confirm: '确认审核通过？' },
+      { name: 'reject', label: '拒绝', path: 'reject', danger: true, payload: { reviewed_by: 'admin' }, confirm: '确认拒绝提现？' },
+      { name: 'markPaid', label: '已打款', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入打款交易 Hash', payload: { reviewed_by: 'admin' } },
+    ],
   },
   users: {
     title: '用户管理', endpoint: '/users', description: 'Telegram 用户、邀请关系、会员状态、拉黑/置顶',
     columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '用户名', dataIndex: 'username' }, { title: '昵称', dataIndex: 'first_name' }, { title: '邀请人', dataIndex: 'inviter_id' }, { title: '会员等级', dataIndex: 'member_level' }, { title: '拉黑', dataIndex: 'is_blacklisted' }, { title: '置顶', dataIndex: 'is_top' }],
     fields: [{ label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户名', name: 'username' }, { label: '昵称', name: 'first_name' }, { label: '邀请人ID', name: 'inviter_id' }, { label: '会员等级', name: 'member_level' }, { label: '拉黑', name: 'is_blacklisted', type: 'boolean' }, { label: '置顶', name: 'is_top', type: 'boolean' }, { label: '累计充值', name: 'total_recharge', type: 'number' }, { label: '累计消费', name: 'total_consumption', type: 'number' }],
+    actions: [
+      { name: 'blacklist', label: '拉黑', path: 'blacklist', danger: true, confirm: '确认拉黑该用户？' },
+      { name: 'unblacklist', label: '取消拉黑', path: 'unblacklist', confirm: '确认取消拉黑？' },
+      { name: 'top', label: '置顶', path: 'top', confirm: '确认置顶该用户？' },
+      { name: 'untop', label: '取消置顶', path: 'untop', confirm: '确认取消置顶？' },
+    ],
   },
   userTops: {
     title: '用户排行', endpoint: '/user-tops', description: '用户充值/消费排行快照',
@@ -181,6 +213,10 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '预支记录', endpoint: '/energy/advance-records', description: '用户/代理预支审核记录',
     columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }, { title: '审核人', dataIndex: 'reviewed_by' }],
     fields: [{ label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '状态', name: 'status' }, { label: '原因', name: 'reason', type: 'textarea' }, { label: '审核人', name: 'reviewed_by' }],
+    actions: [
+      { name: 'approve', label: '通过', path: 'approve', payload: { reviewed_by: 'admin' }, confirm: '确认通过预支？' },
+      { name: 'reject', label: '拒绝', path: 'reject', danger: true, payload: { reviewed_by: 'admin' }, confirm: '确认拒绝预支？' },
+    ],
   },
   energyAddressConfigs: {
     title: '能量地址配置', endpoint: '/energy/address-configs', description: '笔数/智能托管/闪租地址池配置',
@@ -236,11 +272,20 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '能量租赁记录', endpoint: '/energy/records', description: '闪租/笔数/智能托管租赁执行记录',
     columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '接收地址', dataIndex: 'receiver_address' }, { title: '模式', dataIndex: 'mode' }, { title: '能量', dataIndex: 'energy_amount' }, { title: '金额TRX', dataIndex: 'amount_trx' }, { title: '状态', dataIndex: 'status' }],
     fields: [{ label: '订单号', name: 'order_no' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户ID', name: 'user_id' }, { label: '接收地址', name: 'receiver_address' }, { label: '模式', name: 'mode' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: '小时', name: 'duration_hours', type: 'number' }, { label: '笔数', name: 'number_of_times', type: 'number' }, { label: '金额TRX', name: 'amount_trx', type: 'number' }, { label: 'Hash', name: 'txid' }, { label: '状态', name: 'status' }],
+    actions: [
+      { name: 'success', label: '成功', path: 'success', promptField: 'txid', promptLabel: '请输入能量交易 Hash' },
+      { name: 'fail', label: '失败', path: 'fail', danger: true, confirm: '确认标记失败？' },
+    ],
   },
   exchangeRecords: {
     title: '兑换记录', endpoint: '/exchange/records', description: '兑换执行记录、汇率、手续费和Hash',
     columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: 'From', dataIndex: 'from_token' }, { title: 'To', dataIndex: 'to_token' }, { title: '原金额', dataIndex: 'from_amount' }, { title: '目标金额', dataIndex: 'to_amount' }, { title: '状态', dataIndex: 'status' }],
     fields: [{ label: '订单号', name: 'order_no' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户ID', name: 'user_id' }, { label: 'From币种', name: 'from_token' }, { label: 'To币种', name: 'to_token' }, { label: '原金额', name: 'from_amount', type: 'number' }, { label: '目标金额', name: 'to_amount', type: 'number' }, { label: '汇率', name: 'rate', type: 'number' }, { label: '手续费', name: 'fee', type: 'number' }, { label: '状态', name: 'status' }, { label: '支付Hash', name: 'pay_txid' }, { label: '出款Hash', name: 'payout_txid' }],
+    actions: [
+      { name: 'markPaid', label: '已支付', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入支付 Hash' },
+      { name: 'markSent', label: '已出款', path: 'mark-sent', promptField: 'txid', promptLabel: '请输入出款 Hash' },
+      { name: 'fail', label: '失败', path: 'fail', danger: true, confirm: '确认标记失败？' },
+    ],
   },
   rechargeConfigs: {
     title: '充值配置', endpoint: '/finance/recharge-configs', description: '充值地址、币种、最小金额和确认数',
