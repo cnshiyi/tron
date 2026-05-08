@@ -6,15 +6,22 @@ from accounts.auth_views import codes, login, logout, refresh, user_info
 from accounts.views import DashboardView
 from bots.views import BotGroupViewSet, BotViewSet, PromotionViewSet, telegram_webhook
 from wallet.views import AddressViewSet, ChainTransactionViewSet, ListenAddressViewSet, TransactionProbeView
-from exchange.views import ExchangeConfigViewSet, ExchangeOrderViewSet, ExchangeBlacklistViewSet
+from exchange.views import ExchangeBlacklistViewSet, ExchangeConfigViewSet, ExchangeOrderViewSet, ExchangeRecordViewSet
 from energy.views import (
     AdvanceRecordViewSet,
     EnergyAddressConfigViewSet,
     EnergyAgentRecordViewSet,
     EnergyCallbackView,
     EnergyCommissionViewSet,
+    EnergyHourlyTimePriceViewSet,
+    EnergyHourlyTimeViewSet,
+    EnergyIntelligentPlanViewSet,
     EnergyOrderViewSet,
+    EnergyPenFlashEntryViewSet,
+    EnergyPenPlanViewSet,
     EnergyPlanViewSet,
+    EnergyRecordViewSet,
+    NumberOfOrdersViewSet,
 )
 from membership.views import (
     MemberActivityViewSet,
@@ -23,7 +30,7 @@ from membership.views import (
     MemberOrderViewSet,
     MemberRechargeViewSet,
 )
-from finance.views import BalanceViewSet, WithdrawalViewSet, RunningWaterViewSet
+from finance.views import BalanceViewSet, RechargeConfigViewSet, WithdrawalViewSet, RunningWaterViewSet
 from tgusers.views import TgUserViewSet, UserTopViewSet
 
 router = DefaultRouter()
@@ -37,6 +44,7 @@ router.register(r"listen-addresses", ListenAddressViewSet)
 router.register(r"transactions", ChainTransactionViewSet)
 router.register(r"exchange/configs", ExchangeConfigViewSet)
 router.register(r"exchange/orders", ExchangeOrderViewSet)
+router.register(r"exchange/records", ExchangeRecordViewSet)
 router.register(r"exchange/blacklist", ExchangeBlacklistViewSet)
 router.register(r"energy/plans", EnergyPlanViewSet)
 router.register(r"energy/orders", EnergyOrderViewSet)
@@ -44,6 +52,13 @@ router.register(r"energy/commissions", EnergyCommissionViewSet)
 router.register(r"energy/agent-records", EnergyAgentRecordViewSet)
 router.register(r"energy/advance-records", AdvanceRecordViewSet)
 router.register(r"energy/address-configs", EnergyAddressConfigViewSet)
+router.register(r"energy/hourly-times", EnergyHourlyTimeViewSet)
+router.register(r"energy/hourly-time-prices", EnergyHourlyTimePriceViewSet)
+router.register(r"energy/pen-plans", EnergyPenPlanViewSet)
+router.register(r"energy/number-of-orders", NumberOfOrdersViewSet)
+router.register(r"energy/pen-flash-entries", EnergyPenFlashEntryViewSet)
+router.register(r"energy/intelligent-plans", EnergyIntelligentPlanViewSet)
+router.register(r"energy/records", EnergyRecordViewSet)
 router.register(r"membership/goods", MemberGoodsViewSet)
 router.register(r"membership/orders", MemberOrderViewSet)
 router.register(r"membership/recharges", MemberRechargeViewSet)
@@ -52,6 +67,7 @@ router.register(r"membership/commissions", MemberCommissionViewSet)
 router.register(r"finance/balances", BalanceViewSet)
 router.register(r"finance/withdrawals", WithdrawalViewSet)
 router.register(r"finance/running-water", RunningWaterViewSet)
+router.register(r"finance/recharge-configs", RechargeConfigViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

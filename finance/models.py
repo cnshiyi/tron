@@ -27,3 +27,13 @@ class Withdrawal(TimeStampedModel):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     txid = models.CharField(max_length=128, blank=True, default="")
     reviewed_by = models.CharField(max_length=128, blank=True, default="")
+
+
+class RechargeConfig(TimeStampedModel):
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    token_type = models.CharField(max_length=20, default="usdt")
+    address = models.CharField(max_length=64, blank=True, default="")
+    min_amount = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    confirmations = models.PositiveIntegerField(default=1)
+    enabled = models.BooleanField(default=True)
+    remark = models.CharField(max_length=255, blank=True, default="")

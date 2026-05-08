@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Balance, RunningWater, Withdrawal
+from .models import Balance, RechargeConfig, RunningWater, Withdrawal
 
 class BalanceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +16,7 @@ class WithdrawalSerializer(serializers.ModelSerializer):
         model = Withdrawal
         fields = "__all__"
 
+class RechargeConfigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RechargeConfig
+        fields = "__all__"

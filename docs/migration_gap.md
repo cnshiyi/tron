@@ -14,26 +14,26 @@
 - TgConfigList.vue: 部分覆盖：系统配置 Settings.vue.
 - TgEnergyAgentRecordList.vue: 基础覆盖：能量代理记录 CRUD/API 已迁入。
 - TgEnergyHourlyList.vue: 合并覆盖：能量套餐/能量订单.
-- TgEnergyHourlyTimeList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
-- TgEnergyHourlyTimePiceList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgEnergyHourlyTimeList.vue: 基础覆盖：能量时长配置 CRUD/API 已迁入。
+- TgEnergyHourlyTimePiceList.vue: 基础覆盖：能量时长价格 CRUD/API 已迁入。
 - TgEnergyIntelligentAddressList.vue: 基础覆盖：能量地址配置 CRUD/API 已迁入。
-- TgEnergyIntelligentList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgEnergyIntelligentList.vue: 基础覆盖：智能托管套餐 CRUD/API 已迁入。
 - TgEnergyPenAddressList.vue: 基础覆盖：能量地址配置 CRUD/API 已迁入。
-- TgEnergyPenFlashEntList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
-- TgEnergyPenList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
-- TgEnergyRecordList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgEnergyPenFlashEntList.vue: 基础覆盖：能量闪租入口 CRUD/API 已迁入。
+- TgEnergyPenList.vue: 基础覆盖：能量笔数套餐 CRUD/API 已迁入。
+- TgEnergyRecordList.vue: 基础覆盖：能量租赁记录 CRUD/API 已迁入。
 - TgExchangeBlackList.vue: 覆盖基础 CRUD：兑换黑名单.
 - TgExchangeList.vue: 部分覆盖：兑换订单.
-- TgExchangeRecordList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgExchangeRecordList.vue: 基础覆盖：兑换记录 CRUD/API 已迁入。
 - TgGroupList.vue: 部分覆盖：群组管理 ResourcePage.
 - TgListerAddressList.vue: 基础覆盖：监听地址 CRUD/API 已迁入。
 - TgMemberActivityList.vue: 基础覆盖：会员活动 CRUD/API 已迁入。
 - TgMemberGoodsList.vue: 覆盖基础 CRUD：会员商品.
 - TgMemberOrderList.vue: 覆盖基础 CRUD：会员订单.
 - TgMemberRechargeList.vue: 基础覆盖：会员充值 CRUD/API 已迁入。
-- TgNumberOfOrdersList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgNumberOfOrdersList.vue: 基础覆盖：笔数订单/次数 CRUD/API 已迁入。
 - TgPromotionList.vue: 部分覆盖：推广文案 ResourcePage.
-- TgRechargeConfigList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgRechargeConfigList.vue: 基础覆盖：充值配置 CRUD/API 已迁入。
 - TgRunningWaterList.vue: 覆盖基础 CRUD：资金流水.
 - TgUserList.vue: 基础覆盖：用户管理 CRUD/API 已迁入。
 - TgUserTopList.vue: 基础覆盖：用户排行 CRUD/API 已迁入。

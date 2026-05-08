@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ExchangeConfig, ExchangeOrder, ExchangeBlacklist
+from .models import ExchangeBlacklist, ExchangeConfig, ExchangeOrder, ExchangeRecord
 
 class ExchangeConfigSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +16,7 @@ class ExchangeBlacklistSerializer(serializers.ModelSerializer):
         model = ExchangeBlacklist
         fields = "__all__"
 
+class ExchangeRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExchangeRecord
+        fields = "__all__"

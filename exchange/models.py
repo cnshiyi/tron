@@ -28,3 +28,18 @@ class ExchangeOrder(TimeStampedModel):
 class ExchangeBlacklist(TimeStampedModel):
     address = models.CharField(max_length=64, unique=True)
     reason = models.CharField(max_length=255, blank=True, default="")
+
+
+class ExchangeRecord(TimeStampedModel):
+    order_no = models.CharField(max_length=64, unique=True)
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    user_id = models.CharField(max_length=128, blank=True, default="")
+    from_token = models.CharField(max_length=20, default="usdt")
+    to_token = models.CharField(max_length=20, default="trx")
+    from_amount = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    to_amount = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    rate = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    fee = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    status = models.CharField(max_length=20, default="pending")
+    pay_txid = models.CharField(max_length=128, blank=True, default="")
+    payout_txid = models.CharField(max_length=128, blank=True, default="")

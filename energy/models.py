@@ -65,3 +65,69 @@ class EnergyAddressConfig(TimeStampedModel):
     max_energy = models.PositiveIntegerField(default=0)
     used_energy = models.PositiveIntegerField(default=0)
     enabled = models.BooleanField(default=True)
+
+
+class EnergyHourlyTime(TimeStampedModel):
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    name = models.CharField(max_length=100)
+    hours = models.PositiveIntegerField(default=1)
+    enabled = models.BooleanField(default=True)
+    sort = models.IntegerField(default=0)
+
+class EnergyHourlyTimePrice(TimeStampedModel):
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    time = models.ForeignKey(EnergyHourlyTime, null=True, blank=True, on_delete=models.SET_NULL)
+    energy_amount = models.PositiveIntegerField(default=32000)
+    price_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    price_usdt = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    enabled = models.BooleanField(default=True)
+
+class EnergyPenPlan(TimeStampedModel):
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    name = models.CharField(max_length=100)
+    number_of_times = models.PositiveIntegerField(default=1)
+    energy_amount = models.PositiveIntegerField(default=32000)
+    price_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    price_usdt = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    enabled = models.BooleanField(default=True)
+    sort = models.IntegerField(default=0)
+
+class NumberOfOrders(TimeStampedModel):
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    user_id = models.CharField(max_length=128, blank=True, default="")
+    available_times = models.PositiveIntegerField(default=0)
+    used_times = models.PositiveIntegerField(default=0)
+    source_order_no = models.CharField(max_length=64, blank=True, default="")
+    expire_at = models.DateTimeField(null=True, blank=True)
+
+class EnergyPenFlashEntry(TimeStampedModel):
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    title = models.CharField(max_length=128)
+    address = models.CharField(max_length=64, blank=True, default="")
+    energy_amount = models.PositiveIntegerField(default=0)
+    price_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    enabled = models.BooleanField(default=True)
+    sort = models.IntegerField(default=0)
+
+class EnergyIntelligentPlan(TimeStampedModel):
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    name = models.CharField(max_length=100)
+    min_energy = models.PositiveIntegerField(default=0)
+    max_energy = models.PositiveIntegerField(default=0)
+    price_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    strategy = models.CharField(max_length=50, default="auto")
+    enabled = models.BooleanField(default=True)
+    sort = models.IntegerField(default=0)
+
+class EnergyRecord(TimeStampedModel):
+    order_no = models.CharField(max_length=64, unique=True)
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    user_id = models.CharField(max_length=128, blank=True, default="")
+    receiver_address = models.CharField(max_length=64, blank=True, default="")
+    mode = models.CharField(max_length=20, default="hourly")
+    energy_amount = models.PositiveIntegerField(default=0)
+    duration_hours = models.PositiveIntegerField(default=0)
+    number_of_times = models.PositiveIntegerField(default=0)
+    amount_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    txid = models.CharField(max_length=128, blank=True, default="")
+    status = models.CharField(max_length=20, default="pending")

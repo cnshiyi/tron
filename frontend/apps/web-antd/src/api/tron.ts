@@ -202,4 +202,49 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '邀请人', dataIndex: 'inviter_id' }, { title: '订单号', dataIndex: 'source_order_no' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }],
     fields: [{ label: '用户ID', name: 'user_id' }, { label: '邀请人ID', name: 'inviter_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '来源订单', name: 'source_order_no' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '状态', name: 'status' }],
   },
+  energyHourlyTimes: {
+    title: '能量时长配置', endpoint: '/energy/hourly-times', description: '闪租时长入口配置',
+    columns: [{ title: '名称', dataIndex: 'name' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '小时', dataIndex: 'hours' }, { title: '启用', dataIndex: 'enabled' }, { title: '排序', dataIndex: 'sort' }],
+    fields: [{ label: '名称', name: 'name' }, { label: '机器人ID', name: 'bot_id' }, { label: '小时', name: 'hours', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '排序', name: 'sort', type: 'number' }],
+  },
+  energyHourlyTimePrices: {
+    title: '能量时长价格', endpoint: '/energy/hourly-time-prices', description: '不同能量/时长价格配置',
+    columns: [{ title: '时长ID', dataIndex: 'time' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '能量', dataIndex: 'energy_amount' }, { title: 'TRX价格', dataIndex: 'price_trx' }, { title: 'USDT价格', dataIndex: 'price_usdt' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '时长ID', name: 'time', type: 'number' }, { label: '机器人ID', name: 'bot_id' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: 'TRX价格', name: 'price_trx', type: 'number' }, { label: 'USDT价格', name: 'price_usdt', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }],
+  },
+  energyPenPlans: {
+    title: '能量笔数套餐', endpoint: '/energy/pen-plans', description: '按笔数购买的能量套餐',
+    columns: [{ title: '名称', dataIndex: 'name' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '笔数', dataIndex: 'number_of_times' }, { title: '能量', dataIndex: 'energy_amount' }, { title: 'TRX价格', dataIndex: 'price_trx' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '名称', name: 'name' }, { label: '机器人ID', name: 'bot_id' }, { label: '笔数', name: 'number_of_times', type: 'number' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: 'TRX价格', name: 'price_trx', type: 'number' }, { label: 'USDT价格', name: 'price_usdt', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '排序', name: 'sort', type: 'number' }],
+  },
+  numberOfOrders: {
+    title: '笔数订单/次数', endpoint: '/energy/number-of-orders', description: '用户可用笔数、已用笔数和来源订单',
+    columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '可用笔数', dataIndex: 'available_times' }, { title: '已用笔数', dataIndex: 'used_times' }, { title: '来源订单', dataIndex: 'source_order_no' }, { title: '到期时间', dataIndex: 'expire_at' }],
+    fields: [{ label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '可用笔数', name: 'available_times', type: 'number' }, { label: '已用笔数', name: 'used_times', type: 'number' }, { label: '来源订单', name: 'source_order_no' }, { label: '到期时间', name: 'expire_at' }],
+  },
+  energyPenFlashEntries: {
+    title: '能量闪租入口', endpoint: '/energy/pen-flash-entries', description: '闪租入口、地址和定价',
+    columns: [{ title: '标题', dataIndex: 'title' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '地址', dataIndex: 'address' }, { title: '能量', dataIndex: 'energy_amount' }, { title: 'TRX价格', dataIndex: 'price_trx' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '标题', name: 'title' }, { label: '机器人ID', name: 'bot_id' }, { label: '地址', name: 'address' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: 'TRX价格', name: 'price_trx', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '排序', name: 'sort', type: 'number' }],
+  },
+  energyIntelligentPlans: {
+    title: '智能托管套餐', endpoint: '/energy/intelligent-plans', description: '智能托管策略和能量区间',
+    columns: [{ title: '名称', dataIndex: 'name' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '最小能量', dataIndex: 'min_energy' }, { title: '最大能量', dataIndex: 'max_energy' }, { title: 'TRX价格', dataIndex: 'price_trx' }, { title: '策略', dataIndex: 'strategy' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '名称', name: 'name' }, { label: '机器人ID', name: 'bot_id' }, { label: '最小能量', name: 'min_energy', type: 'number' }, { label: '最大能量', name: 'max_energy', type: 'number' }, { label: 'TRX价格', name: 'price_trx', type: 'number' }, { label: '策略', name: 'strategy' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '排序', name: 'sort', type: 'number' }],
+  },
+  energyRecords: {
+    title: '能量租赁记录', endpoint: '/energy/records', description: '闪租/笔数/智能托管租赁执行记录',
+    columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '接收地址', dataIndex: 'receiver_address' }, { title: '模式', dataIndex: 'mode' }, { title: '能量', dataIndex: 'energy_amount' }, { title: '金额TRX', dataIndex: 'amount_trx' }, { title: '状态', dataIndex: 'status' }],
+    fields: [{ label: '订单号', name: 'order_no' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户ID', name: 'user_id' }, { label: '接收地址', name: 'receiver_address' }, { label: '模式', name: 'mode' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: '小时', name: 'duration_hours', type: 'number' }, { label: '笔数', name: 'number_of_times', type: 'number' }, { label: '金额TRX', name: 'amount_trx', type: 'number' }, { label: 'Hash', name: 'txid' }, { label: '状态', name: 'status' }],
+  },
+  exchangeRecords: {
+    title: '兑换记录', endpoint: '/exchange/records', description: '兑换执行记录、汇率、手续费和Hash',
+    columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: 'From', dataIndex: 'from_token' }, { title: 'To', dataIndex: 'to_token' }, { title: '原金额', dataIndex: 'from_amount' }, { title: '目标金额', dataIndex: 'to_amount' }, { title: '状态', dataIndex: 'status' }],
+    fields: [{ label: '订单号', name: 'order_no' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户ID', name: 'user_id' }, { label: 'From币种', name: 'from_token' }, { label: 'To币种', name: 'to_token' }, { label: '原金额', name: 'from_amount', type: 'number' }, { label: '目标金额', name: 'to_amount', type: 'number' }, { label: '汇率', name: 'rate', type: 'number' }, { label: '手续费', name: 'fee', type: 'number' }, { label: '状态', name: 'status' }, { label: '支付Hash', name: 'pay_txid' }, { label: '出款Hash', name: 'payout_txid' }],
+  },
+  rechargeConfigs: {
+    title: '充值配置', endpoint: '/finance/recharge-configs', description: '充值地址、币种、最小金额和确认数',
+    columns: [{ title: '机器人', dataIndex: 'bot_id' }, { title: '币种', dataIndex: 'token_type' }, { title: '地址', dataIndex: 'address' }, { title: '最小金额', dataIndex: 'min_amount' }, { title: '确认数', dataIndex: 'confirmations' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '机器人ID', name: 'bot_id' }, { label: '币种', name: 'token_type' }, { label: '地址', name: 'address' }, { label: '最小金额', name: 'min_amount', type: 'number' }, { label: '确认数', name: 'confirmations', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '备注', name: 'remark' }],
+  },
 };
