@@ -32,6 +32,7 @@ from membership.views import (
 )
 from finance.views import BalanceViewSet, RechargeConfigViewSet, WithdrawalViewSet, RunningWaterViewSet
 from tgusers.views import TgUserViewSet, UserTopViewSet
+from configcenter.views import TextConfigViewSet, ui_text
 
 router = DefaultRouter()
 router.register(r"bots", BotViewSet)
@@ -69,6 +70,7 @@ router.register(r"finance/balances", BalanceViewSet)
 router.register(r"finance/withdrawals", WithdrawalViewSet)
 router.register(r"finance/running-water", RunningWaterViewSet)
 router.register(r"finance/recharge-configs", RechargeConfigViewSet)
+router.register(r"text-configs", TextConfigViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -79,6 +81,7 @@ urlpatterns = [
     path("api/user/info", user_info, name="user-info"),
     path("api/dashboard/", DashboardView.as_view(), name="dashboard"),
     path("api/reports/overview/", ReportOverviewView.as_view(), name="reports-overview"),
+    path("api/ui-text/", ui_text, name="ui-text"),
     path("api/wallet/probe/<str:address>/", TransactionProbeView.as_view(), name="wallet-probe"),
     path("api/energy/callback/", EnergyCallbackView.as_view(), name="energy-callback"),
     path("api/telegram/webhook/<str:bot_id>/", telegram_webhook, name="telegram-webhook"),

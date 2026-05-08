@@ -16,6 +16,28 @@ export interface ResourceConfig {
   actions?: Array<{ name: string; label: string; path: string; danger?: boolean; confirm?: string; promptField?: string; promptLabel?: string; payload?: Record<string, any> }>;
 }
 
+
+export interface TextConfigDefault {
+  category?: string;
+  description?: string;
+  key: string;
+  label?: string;
+  sort?: number;
+  value: string;
+}
+
+let uiTextMap: Record<string, string> = {};
+let uiTextLoaded = false;
+
+export function uiText(key: string, fallback = '') {
+  return uiTextMap[key] ?? fallback;
+}
+
+export function setUiTextMap(map: Record<string, string>) {
+  uiTextMap = map || {};
+  uiTextLoaded = true;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
   const response = await fetch(url, {
@@ -78,6 +100,21 @@ export function bulkCreateBots(data: {
     '/bots/bulk-create/',
     { method: 'POST', body: JSON.stringify(data) },
   );
+}
+
+
+export async function loadUiText(force = false) {
+  if (uiTextLoaded && !force) return uiTextMap;
+  const data = await request<Record<string, string>>('/ui-text/');
+  setUiTextMap(data);
+  return uiTextMap;
+}
+
+export function syncTextDefaults(items: TextConfigDefault[]) {
+  return request<{ created: number; total: number; updated: number }>('/text-configs/sync-defaults/', {
+    method: 'POST',
+    body: JSON.stringify({ items }),
+  });
 }
 
 export async function getSingleton(endpoint: string, defaults: Record<string, any> = {}) {
@@ -321,9 +358,89 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       { name: 'fail', label: '失败', path: 'fail', danger: true, confirm: '确认标记失败？' },
     ],
   },
+  textConfigs: {
+    title: '文字配置', endpoint: '/text-configs', description: '后台统一维护菜单、表格、按钮、提示、机器人文案等所有可配置文字',
+    columns: [{ title: '配置键', dataIndex: 'key' }, { title: '名称', dataIndex: 'label' }, { title: '配置值', dataIndex: 'value' }, { title: '分类', dataIndex: 'category' }, { title: '启用', dataIndex: 'is_active' }],
+    fields: [{ label: '配置键', name: 'key' }, { label: '名称', name: 'label' }, { label: '配置值', name: 'value', type: 'textarea' }, { label: '默认值', name: 'default_value', type: 'textarea' }, { label: '分类', name: 'category' }, { label: '说明', name: 'description', type: 'textarea' }, { label: '排序', name: 'sort', type: 'number' }, { label: '启用', name: 'is_active', type: 'boolean' }],
+  },
   rechargeConfigs: {
     title: '充值配置', endpoint: '/finance/recharge-configs', description: '充值地址、币种、最小金额和确认数',
     columns: [{ title: '机器人', dataIndex: 'bot_id' }, { title: '币种', dataIndex: 'token_type' }, { title: '地址', dataIndex: 'address' }, { title: '最小金额', dataIndex: 'min_amount' }, { title: '确认数', dataIndex: 'confirmations' }, { title: '启用', dataIndex: 'enabled' }],
     fields: [{ label: '机器人ID', name: 'bot_id' }, { label: '币种', name: 'token_type' }, { label: '地址', name: 'address' }, { label: '最小金额', name: 'min_amount', type: 'number' }, { label: '确认数', name: 'confirmations', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '备注', name: 'remark' }],
   },
 };
+
+export const commonTextDefaults: TextConfigDefault[] = [
+  { key: 'common.action', value: '操作', label: '表格操作列', category: 'common' },
+  { key: 'common.search_placeholder', value: '搜索', label: '搜索框占位文字', category: 'common' },
+  { key: 'common.refresh_query', value: '刷新/查询', label: '刷新查询按钮', category: 'common' },
+  { key: 'common.add', value: '新增', label: '新增按钮', category: 'common' },
+  { key: 'common.edit', value: '编辑', label: '编辑按钮', category: 'common' },
+  { key: 'common.delete', value: '删除', label: '删除按钮', category: 'common' },
+  { key: 'common.confirm_delete', value: '确定删除？', label: '删除确认', category: 'common' },
+  { key: 'common.save_success', value: '保存成功', label: '保存成功提示', category: 'common' },
+  { key: 'common.delete_success', value: '已删除', label: '删除成功提示', category: 'common' },
+  { key: 'common.action_success', value: '操作成功', label: '操作成功提示', category: 'common' },
+  { key: 'common.yes', value: '是', label: '布尔值是', category: 'common' },
+  { key: 'common.no', value: '否', label: '布尔值否', category: 'common' },
+  { key: 'common.input_prompt', value: '请输入', label: '默认输入提示', category: 'common' },
+  { key: 'resource.bulk_add_bots', value: '批量添加机器人', label: '批量添加机器人按钮', category: 'resource' },
+  { key: 'resource.bulk_owner', value: '默认归属用户ID', label: '批量机器人归属用户标签', category: 'resource' },
+  { key: 'resource.bulk_owner_placeholder', value: '可选，未填写则为空', label: '批量机器人归属用户占位文字', category: 'resource' },
+  { key: 'resource.bulk_webhook', value: '启用Webhook', label: '批量机器人Webhook标签', category: 'resource' },
+  { key: 'resource.bulk_broadcast', value: '启用群组播报', label: '批量机器人播报标签', category: 'resource' },
+  { key: 'resource.bulk_list', value: '机器人列表', label: '批量机器人列表标签', category: 'resource' },
+  { key: 'resource.bulk_placeholder', value: '每行一个机器人，支持：token 或 robot_id,token 或 robot_id|token|username|昵称|归属用户ID', label: '批量机器人列表占位文字', category: 'resource' },
+  { key: 'resource.bulk_example', value: '示例：123456:AAxxToken 或 bot001,123456:AAxxToken 或 bot001|123456:AAxxToken|my_bot|机器人昵称|10001', label: '批量机器人示例', category: 'resource' },
+  { key: 'resource.bulk_success_template', value: '批量添加完成：新增 {created} 个，跳过 {skipped} 个，错误 {errors} 个', label: '批量添加成功模板', category: 'resource' },
+  { key: 'dashboard.title', value: 'TRON 能量机器人后台', label: '控制台说明卡片标题', category: 'dashboard' },
+  { key: 'dashboard.description_1', value: '已迁移旧系统的机器人、兑换、能量、会员、资金、地址池等核心管理入口，前端继续使用 vue-vben-admin。', label: '控制台说明第一行', category: 'dashboard' },
+  { key: 'dashboard.description_2', value: '控制台已接入统计报表：用户、订单、收益、佣金、兑换、能量、会员、提现和资金流水。', label: '控制台说明第二行', category: 'dashboard' },
+  { key: 'dashboard.summary_title', value: '收益/资金汇总', label: '控制台收益汇总标题', category: 'dashboard' },
+  { key: 'dashboard.exchange_status_title', value: '兑换订单状态', label: '控制台兑换状态标题', category: 'dashboard' },
+  { key: 'dashboard.energy_status_title', value: '能量订单状态', label: '控制台能量状态标题', category: 'dashboard' },
+  { key: 'dashboard.member_status_title', value: '会员订单状态', label: '控制台会员状态标题', category: 'dashboard' },
+  { key: 'dashboard.withdrawal_status_title', value: '提现状态', label: '控制台提现状态标题', category: 'dashboard' },
+  { key: 'dashboard.token_summary_title', value: '资金流水币种汇总', label: '控制台币种汇总标题', category: 'dashboard' },
+  { key: 'dashboard.exchange_daily_title', value: '近 14 天兑换金额', label: '控制台每日兑换标题', category: 'dashboard' },
+  { key: 'settings.title', value: '系统配置', label: '系统配置标题', category: 'settings' },
+  { key: 'settings.exchange_title', value: '汇率配置', label: '汇率配置标题', category: 'settings' },
+  { key: 'settings.energy_title', value: '能量闪租配置', label: '能量配置标题', category: 'settings' },
+  { key: 'settings.save', value: '保存配置', label: '保存配置按钮', category: 'settings' },
+  { key: 'settings.saved', value: '配置已保存', label: '保存配置成功提示', category: 'settings' },
+  { key: 'settings.sync_text', value: '同步默认文字配置', label: '同步文字按钮', category: 'settings' },
+  { key: 'settings.sync_success_template', value: '文字配置已同步：新增 {created} 项，更新 {updated} 项', label: '同步文字成功模板', category: 'settings' },
+];
+
+export function getResourceConfig(key: string): ResourceConfig {
+  const source = resourceConfigs[key] || resourceConfigs.bots;
+  const config: ResourceConfig = JSON.parse(JSON.stringify(source));
+  config.title = uiText(`resource.${key}.title`, config.title);
+  if (config.description) config.description = uiText(`resource.${key}.description`, config.description);
+  config.columns = config.columns.map((col) => ({ ...col, title: uiText(`resource.${key}.columns.${col.dataIndex}`, col.title) }));
+  config.fields = config.fields.map((field) => ({ ...field, label: uiText(`resource.${key}.fields.${field.name}`, field.label) }));
+  config.actions = config.actions?.map((action) => ({
+    ...action,
+    confirm: action.confirm ? uiText(`resource.${key}.actions.${action.name}.confirm`, action.confirm) : action.confirm,
+    label: uiText(`resource.${key}.actions.${action.name}.label`, action.label),
+    promptLabel: action.promptLabel ? uiText(`resource.${key}.actions.${action.name}.promptLabel`, action.promptLabel) : action.promptLabel,
+  }));
+  return config;
+}
+
+export function getDefaultTextConfigs(): TextConfigDefault[] {
+  const items: TextConfigDefault[] = [...commonTextDefaults];
+  Object.entries(resourceConfigs).forEach(([key, config], index) => {
+    items.push({ key: `resource.${key}.title`, value: config.title, label: `${config.title} 页面标题`, category: 'resource', sort: index * 100 });
+    if (config.description) items.push({ key: `resource.${key}.description`, value: config.description, label: `${config.title} 页面说明`, category: 'resource', sort: index * 100 + 1 });
+    config.columns.forEach((col, i) => items.push({ key: `resource.${key}.columns.${col.dataIndex}`, value: col.title, label: `${config.title} 表格列 ${col.dataIndex}`, category: 'resource', sort: index * 100 + 10 + i }));
+    config.fields.forEach((field, i) => items.push({ key: `resource.${key}.fields.${field.name}`, value: field.label, label: `${config.title} 表单项 ${field.name}`, category: 'resource', sort: index * 100 + 40 + i }));
+    config.actions?.forEach((action, i) => {
+      items.push({ key: `resource.${key}.actions.${action.name}.label`, value: action.label, label: `${config.title} 操作 ${action.name}`, category: 'resource', sort: index * 100 + 70 + i });
+      if (action.confirm) items.push({ key: `resource.${key}.actions.${action.name}.confirm`, value: action.confirm, label: `${config.title} 操作确认 ${action.name}`, category: 'resource', sort: index * 100 + 80 + i });
+      if (action.promptLabel) items.push({ key: `resource.${key}.actions.${action.name}.promptLabel`, value: action.promptLabel, label: `${config.title} 输入提示 ${action.name}`, category: 'resource', sort: index * 100 + 90 + i });
+    });
+  });
+  return items;
+}
+
