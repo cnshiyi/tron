@@ -3,14 +3,25 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Bot, Promotion, BotGroup
-from .serializers import BotBulkCreateSerializer, BotSerializer, PromotionSerializer, BotGroupSerializer
+
+from .models import Bot, BotGroup, BroadcastLog, Promotion
+from .serializers import (
+    BotBroadcastSerializer,
+    BotBulkCreateSerializer,
+    BotSerializer,
+    BotWebhookSerializer,
+    BotGroupSerializer,
+    BroadcastLogSerializer,
+    PromotionSerializer,
+)
 from .services import TelegramBotService
 
+
 class BotViewSet(viewsets.ModelViewSet):
-    queryset = Bot.objects.all()
+    queryset = Bot.objects.all().order_by("-id")
     serializer_class = BotSerializer
     search_fields = ["robot_id", "username", "first_name"]
+    filterset_fields = ["webhook_enabled", "broadcast_enabled", "owner_user_id"]
 
     @action(detail=False, methods=["post"], url_path="bulk-create")
     def bulk_create(self, request):
@@ -69,17 +80,41 @@ class BotViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
 
+    @action(detail=True, methods=["post"], url_path="set-webhook")
+    def set_webhook(self, request, pk=None):
+        serializer = BotWebhookSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = TelegramBotService().set_webhook(self.get_object(), **serializer.validated_data)
+        return Response(result)
+
+    @action(detail=True, methods=["post"], url_path="broadcast")
+    def broadcast(self, request, pk=None):
+        serializer = BotBroadcastSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = TelegramBotService().broadcast(self.get_object(), **serializer.validated_data)
+        return Response(result)
+
+
 class PromotionViewSet(viewsets.ModelViewSet):
-    queryset = Promotion.objects.select_related("bot").all()
+    queryset = Promotion.objects.select_related("bot").all().order_by("sort", "id")
     serializer_class = PromotionSerializer
     filterset_fields = ["bot", "position", "type", "auto_reply"]
     search_fields = ["title", "command", "content"]
 
+
 class BotGroupViewSet(viewsets.ModelViewSet):
-    queryset = BotGroup.objects.select_related("bot").all()
+    queryset = BotGroup.objects.select_related("bot").all().order_by("-id")
     serializer_class = BotGroupSerializer
     filterset_fields = ["bot", "chat_id", "broadcast_enabled"]
     search_fields = ["chat_id", "title"]
+
+
+class BroadcastLogViewSet(viewsets.ModelViewSet):
+    queryset = BroadcastLog.objects.select_related("bot", "group").all().order_by("-id")
+    serializer_class = BroadcastLogSerializer
+    filterset_fields = ["bot", "group", "chat_id", "status"]
+    search_fields = ["chat_id", "title", "content", "telegram_message_id", "error_message"]
+
 
 @csrf_exempt
 def telegram_webhook(request, bot_id: str):

@@ -33,3 +33,16 @@ class BotGroup(TimeStampedModel):
     chat_id = models.CharField(max_length=128, verbose_name="群组ID")
     title = models.CharField(max_length=255, blank=True, default="群组名称")
     broadcast_enabled = models.BooleanField(default=True, verbose_name="开启收益播报")
+
+
+class BroadcastLog(TimeStampedModel):
+    STATUS_CHOICES = [("pending", "待发送"), ("sent", "已发送"), ("failed", "失败"), ("dry_run", "演练")]
+    bot = models.ForeignKey(Bot, on_delete=models.CASCADE, related_name="broadcast_logs")
+    group = models.ForeignKey(BotGroup, null=True, blank=True, on_delete=models.SET_NULL, related_name="broadcast_logs")
+    chat_id = models.CharField(max_length=128, blank=True, default="")
+    title = models.CharField(max_length=255, blank=True, default="")
+    content = models.TextField(blank=True, default="")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    telegram_message_id = models.CharField(max_length=128, blank=True, default="")
+    error_message = models.TextField(blank=True, default="")
+    payload = models.JSONField(default=dict, blank=True)

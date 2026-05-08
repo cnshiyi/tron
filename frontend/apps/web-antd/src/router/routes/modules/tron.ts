@@ -12,6 +12,7 @@ const routes: RouteRecordRaw[] = [
       { name: 'TronBots', path: '/tron/resource/bots', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:bot', title: '机器人管理' }, props: { key: 'bots' } },
       { name: 'TronPromotions', path: '/tron/resource/promotions', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:megaphone', title: '推广文案' }, props: { key: 'promotions' } },
       { name: 'TronBotGroups', path: '/tron/resource/botGroups', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:users', title: '群组管理' }, props: { key: 'botGroups' } },
+      { name: 'TronBroadcastLogs', path: '/tron/resource/broadcastLogs', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:send', title: '群发记录' }, props: { key: 'broadcastLogs' } },
       { name: 'TronAddresses', path: '/tron/resource/addresses', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:wallet-cards', title: '地址池' }, props: { key: 'addresses' } },
       { name: 'TronExchangeOrders', path: '/tron/resource/exchangeOrders', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:refresh-cw', title: '兑换订单' }, props: { key: 'exchangeOrders' } },
       { name: 'TronExchangeBlacklist', path: '/tron/resource/exchangeBlacklist', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:ban', title: '兑换黑名单' }, props: { key: 'exchangeBlacklist' } },

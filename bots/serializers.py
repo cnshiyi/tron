@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Bot, Promotion, BotGroup
+from .models import Bot, Promotion, BotGroup, BroadcastLog
 
 class BotSerializer(serializers.ModelSerializer):
     class Meta:
@@ -32,3 +32,20 @@ class BotBulkCreateSerializer(serializers.Serializer):
     webhook_enabled = serializers.BooleanField(required=False, default=True)
     broadcast_enabled = serializers.BooleanField(required=False, default=True)
 
+
+
+class BroadcastLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BroadcastLog
+        fields = "__all__"
+
+class BotBroadcastSerializer(serializers.Serializer):
+    content = serializers.CharField(allow_blank=False, trim_whitespace=True)
+    title = serializers.CharField(required=False, allow_blank=True, default="")
+    chat_id = serializers.CharField(required=False, allow_blank=True, default="")
+    dry_run = serializers.BooleanField(required=False, default=True)
+
+class BotWebhookSerializer(serializers.Serializer):
+    base_url = serializers.URLField(required=False, allow_blank=True, default="")
+    drop_pending_updates = serializers.BooleanField(required=False, default=True)
+    dry_run = serializers.BooleanField(required=False, default=True)

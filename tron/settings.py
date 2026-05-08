@@ -101,3 +101,6 @@ TRONGRID_API_KEY = os.getenv("TRONGRID_API_KEY", "")
 SOHU_API_BASE_URL = os.getenv("SOHU_API_BASE_URL", "https://sohuapi.158csm.site/sohuapi")
 SOHU_API_SECRET = os.getenv("SOHU_API_SECRET", "")
 TELEGRAM_WEBHOOK_SECRET = os.getenv("TELEGRAM_WEBHOOK_SECRET", "")
+
+PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "")
+TELEGRAM_SEND_ENABLED = os.getenv("TELEGRAM_SEND_ENABLED", "0") == "1"

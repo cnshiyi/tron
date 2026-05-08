@@ -99,6 +99,10 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     fields: [
       { label: '机器人ID', name: 'robot_id' }, { label: 'Token', name: 'token' }, { label: '用户名', name: 'username' }, { label: '昵称', name: 'first_name' }, { label: '归属用户ID', name: 'owner_user_id' }, { label: '启用Webhook', name: 'webhook_enabled', type: 'boolean' }, { label: '启用群组播报', name: 'broadcast_enabled', type: 'boolean' },
     ],
+    actions: [
+      { name: 'setWebhook', label: '设置Webhook', path: 'set-webhook', promptField: 'base_url', promptLabel: '请输入公网域名，如 https://example.com，留空则使用后端 PUBLIC_BASE_URL', payload: { dry_run: true } },
+      { name: 'broadcast', label: '群发演练', path: 'broadcast', promptField: 'content', promptLabel: '请输入群发内容（默认演练，不真实发送）', payload: { dry_run: true } },
+    ],
   },
   promotions: {
     title: '推广文案', endpoint: '/promotions', description: '机器人命令、消息文案、按钮和自动回复',
@@ -106,6 +110,12 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     fields: [{ label: '机器人ID', name: 'bot', type: 'number' }, { label: '标题', name: 'title' }, { label: '命令', name: 'command' }, { label: '内容', name: 'content', type: 'textarea' }, { label: '链接', name: 'url' }, { label: '回调内容', name: 'callback_data' }, { label: '类型', name: 'type' }, { label: '位置', name: 'position' }, { label: '自动回复', name: 'auto_reply', type: 'boolean' }, { label: '排序', name: 'sort', type: 'number' }],
   },
 
+
+  broadcastLogs: {
+    title: '群发记录', endpoint: '/broadcast-logs', description: '机器人群发/收益播报发送结果和错误日志',
+    columns: [{ title: '机器人', dataIndex: 'bot' }, { title: '群组', dataIndex: 'chat_id' }, { title: '标题', dataIndex: 'title' }, { title: '状态', dataIndex: 'status' }, { title: '消息ID', dataIndex: 'telegram_message_id' }, { title: '错误', dataIndex: 'error_message' }],
+    fields: [{ label: '机器人ID', name: 'bot', type: 'number' }, { label: '群组ID', name: 'group', type: 'number' }, { label: 'Chat ID', name: 'chat_id' }, { label: '标题', name: 'title' }, { label: '内容', name: 'content', type: 'textarea' }, { label: '状态', name: 'status' }, { label: '消息ID', name: 'telegram_message_id' }, { label: '错误信息', name: 'error_message', type: 'textarea' }],
+  },
   botGroups: {
     title: '群组管理', endpoint: '/bot-groups', description: 'Telegram 群组绑定和收益播报开关',
     columns: [{ title: '群组ID', dataIndex: 'chat_id' }, { title: '群组名称', dataIndex: 'title' }, { title: '机器人ID', dataIndex: 'bot' }, { title: '收益播报', dataIndex: 'broadcast_enabled' }],

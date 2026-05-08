@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 from accounts.auth_views import codes, login, logout, refresh, user_info
 from accounts.views import DashboardView, ReportOverviewView
-from bots.views import BotGroupViewSet, BotViewSet, PromotionViewSet, telegram_webhook
+from bots.views import BotGroupViewSet, BotViewSet, BroadcastLogViewSet, PromotionViewSet, telegram_webhook
 from wallet.views import AddressViewSet, ChainTransactionViewSet, ListenAddressViewSet, TransactionProbeView
 from exchange.views import ExchangeBlacklistViewSet, ExchangeConfigViewSet, ExchangeOrderViewSet, ExchangeRecordViewSet
 from energy.views import (
@@ -37,6 +37,7 @@ router = DefaultRouter()
 router.register(r"bots", BotViewSet)
 router.register(r"promotions", PromotionViewSet)
 router.register(r"bot-groups", BotGroupViewSet)
+router.register(r"broadcast-logs", BroadcastLogViewSet)
 router.register(r"users", TgUserViewSet)
 router.register(r"user-tops", UserTopViewSet)
 router.register(r"addresses", AddressViewSet)
