@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Address, ChainTransaction
+from .models import Address, ChainTransaction, ListenAddress
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,3 +11,7 @@ class ChainTransactionSerializer(serializers.ModelSerializer):
         model = ChainTransaction
         fields = "__all__"
 
+class ListenAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ListenAddress
+        fields = "__all__"

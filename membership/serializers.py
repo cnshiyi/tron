@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MemberGoods, MemberOrder
+from .models import MemberActivity, MemberCommission, MemberGoods, MemberOrder, MemberRecharge
 
 class MemberGoodsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,3 +11,17 @@ class MemberOrderSerializer(serializers.ModelSerializer):
         model = MemberOrder
         fields = "__all__"
 
+class MemberRechargeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MemberRecharge
+        fields = "__all__"
+
+class MemberActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MemberActivity
+        fields = "__all__"
+
+class MemberCommissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MemberCommission
+        fields = "__all__"

@@ -152,4 +152,54 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '地址', dataIndex: 'address' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }, { title: 'Hash', dataIndex: 'txid' }],
     fields: [{ label: '用户ID', name: 'user_id' }, { label: '地址', name: 'address' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '状态', name: 'status' }, { label: '交易Hash', name: 'txid' }, { label: '审核人', name: 'reviewed_by' }],
   },
+  users: {
+    title: '用户管理', endpoint: '/users', description: 'Telegram 用户、邀请关系、会员状态、拉黑/置顶',
+    columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '用户名', dataIndex: 'username' }, { title: '昵称', dataIndex: 'first_name' }, { title: '邀请人', dataIndex: 'inviter_id' }, { title: '会员等级', dataIndex: 'member_level' }, { title: '拉黑', dataIndex: 'is_blacklisted' }, { title: '置顶', dataIndex: 'is_top' }],
+    fields: [{ label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '用户名', name: 'username' }, { label: '昵称', name: 'first_name' }, { label: '邀请人ID', name: 'inviter_id' }, { label: '会员等级', name: 'member_level' }, { label: '拉黑', name: 'is_blacklisted', type: 'boolean' }, { label: '置顶', name: 'is_top', type: 'boolean' }, { label: '累计充值', name: 'total_recharge', type: 'number' }, { label: '累计消费', name: 'total_consumption', type: 'number' }],
+  },
+  userTops: {
+    title: '用户排行', endpoint: '/user-tops', description: '用户充值/消费排行快照',
+    columns: [{ title: '排名', dataIndex: 'rank' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '排行类型', dataIndex: 'rank_type' }, { title: '金额', dataIndex: 'amount' }, { title: '日期', dataIndex: 'snapshot_date' }],
+    fields: [{ label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '排行类型', name: 'rank_type' }, { label: '金额', name: 'amount', type: 'number' }, { label: '排名', name: 'rank', type: 'number' }, { label: '快照日期', name: 'snapshot_date' }],
+  },
+  listenAddresses: {
+    title: '监听地址', endpoint: '/listen-addresses', description: '链上充值/兑换监听地址',
+    columns: [{ title: '地址', dataIndex: 'address' }, { title: '标签', dataIndex: 'label' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '币种', dataIndex: 'token_type' }, { title: '最小金额', dataIndex: 'min_amount' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '地址', name: 'address' }, { label: '标签', name: 'label' }, { label: '机器人ID', name: 'bot_id' }, { label: '币种', name: 'token_type' }, { label: '最小金额', name: 'min_amount', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '最后扫描Hash', name: 'last_scanned_txid' }],
+  },
+  transactions: {
+    title: '链上交易', endpoint: '/transactions', description: 'TRX/USDT/能量链上交易记录',
+    columns: [{ title: 'Hash', dataIndex: 'txid' }, { title: 'From', dataIndex: 'from_address' }, { title: 'To', dataIndex: 'to_address' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '确认', dataIndex: 'confirmed' }],
+    fields: [{ label: 'Hash', name: 'txid' }, { label: 'From', name: 'from_address' }, { label: 'To', name: 'to_address' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '确认', name: 'confirmed', type: 'boolean' }],
+  },
+  energyAgentRecords: {
+    title: '能量代理记录', endpoint: '/energy/agent-records', description: '代理能量订单、成本与利润',
+    columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '代理用户', dataIndex: 'agent_user_id' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '接收地址', dataIndex: 'receiver_address' }, { title: '能量', dataIndex: 'energy_amount' }, { title: '利润TRX', dataIndex: 'profit_trx' }, { title: '状态', dataIndex: 'status' }],
+    fields: [{ label: '订单号', name: 'order_no' }, { label: '机器人ID', name: 'bot_id' }, { label: '代理用户ID', name: 'agent_user_id' }, { label: '用户ID', name: 'user_id' }, { label: '接收地址', name: 'receiver_address' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: '成本TRX', name: 'cost_trx', type: 'number' }, { label: '利润TRX', name: 'profit_trx', type: 'number' }, { label: '状态', name: 'status' }, { label: '交易Hash', name: 'txid' }],
+  },
+  energyAdvanceRecords: {
+    title: '预支记录', endpoint: '/energy/advance-records', description: '用户/代理预支审核记录',
+    columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }, { title: '审核人', dataIndex: 'reviewed_by' }],
+    fields: [{ label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '状态', name: 'status' }, { label: '原因', name: 'reason', type: 'textarea' }, { label: '审核人', name: 'reviewed_by' }],
+  },
+  energyAddressConfigs: {
+    title: '能量地址配置', endpoint: '/energy/address-configs', description: '笔数/智能托管/闪租地址池配置',
+    columns: [{ title: '地址', dataIndex: 'address' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '模式', dataIndex: 'mode' }, { title: '最大能量', dataIndex: 'max_energy' }, { title: '已用能量', dataIndex: 'used_energy' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '地址', name: 'address' }, { label: '私钥/密文', name: 'private_key_encrypted', type: 'textarea' }, { label: '机器人ID', name: 'bot_id' }, { label: '模式', name: 'mode' }, { label: '最大能量', name: 'max_energy', type: 'number' }, { label: '已用能量', name: 'used_energy', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }],
+  },
+  memberRecharges: {
+    title: '会员充值', endpoint: '/membership/recharges', description: '会员/余额充值记录',
+    columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '用户ID', dataIndex: 'user_id' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }, { title: 'Hash', dataIndex: 'txid' }],
+    fields: [{ label: '订单号', name: 'order_no' }, { label: '用户ID', name: 'user_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: 'Hash', name: 'txid' }, { label: '状态', name: 'status' }],
+  },
+  memberActivities: {
+    title: '会员活动', endpoint: '/membership/activities', description: '充值赠送、会员活动、奖励规则',
+    columns: [{ title: '标题', dataIndex: 'title' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '类型', dataIndex: 'activity_type' }, { title: '奖励', dataIndex: 'reward_amount' }, { title: '币种', dataIndex: 'reward_token' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '标题', name: 'title' }, { label: '机器人ID', name: 'bot_id' }, { label: '活动类型', name: 'activity_type' }, { label: '奖励金额', name: 'reward_amount', type: 'number' }, { label: '奖励币种', name: 'reward_token' }, { label: '开始时间', name: 'start_at' }, { label: '结束时间', name: 'end_at' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '规则', name: 'rule', type: 'textarea' }],
+  },
+  memberCommissions: {
+    title: '会员佣金', endpoint: '/membership/commissions', description: '邀请/会员分佣记录',
+    columns: [{ title: '用户ID', dataIndex: 'user_id' }, { title: '邀请人', dataIndex: 'inviter_id' }, { title: '订单号', dataIndex: 'source_order_no' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '状态', dataIndex: 'status' }],
+    fields: [{ label: '用户ID', name: 'user_id' }, { label: '邀请人ID', name: 'inviter_id' }, { label: '机器人ID', name: 'bot_id' }, { label: '来源订单', name: 'source_order_no' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '状态', name: 'status' }],
+  },
 };

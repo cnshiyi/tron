@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from .models import EnergyPlan, EnergyOrder, EnergyCommission
+from .models import (
+    AdvanceRecord,
+    EnergyAddressConfig,
+    EnergyAgentRecord,
+    EnergyCommission,
+    EnergyOrder,
+    EnergyPlan,
+)
 
 class EnergyPlanSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +23,17 @@ class EnergyCommissionSerializer(serializers.ModelSerializer):
         model = EnergyCommission
         fields = "__all__"
 
+class EnergyAgentRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnergyAgentRecord
+        fields = "__all__"
+
+class AdvanceRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdvanceRecord
+        fields = "__all__"
+
+class EnergyAddressConfigSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnergyAddressConfig
+        fields = "__all__"

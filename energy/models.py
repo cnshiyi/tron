@@ -34,3 +34,34 @@ class EnergyCommission(TimeStampedModel):
     order = models.ForeignKey(EnergyOrder, on_delete=models.CASCADE, related_name="commissions")
     exchange_rate = models.DecimalField(max_digits=20, decimal_places=8, default=0)
     profit_usdt = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+
+class EnergyAgentRecord(TimeStampedModel):
+    order_no = models.CharField(max_length=64, unique=True)
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    agent_user_id = models.CharField(max_length=128, blank=True, default="")
+    user_id = models.CharField(max_length=128, blank=True, default="")
+    receiver_address = models.CharField(max_length=64, blank=True, default="")
+    energy_amount = models.PositiveIntegerField(default=0)
+    cost_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    profit_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    status = models.CharField(max_length=20, default="pending")
+    txid = models.CharField(max_length=128, blank=True, default="")
+
+class AdvanceRecord(TimeStampedModel):
+    user_id = models.CharField(max_length=128)
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    amount = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    token_type = models.CharField(max_length=20, default="trx")
+    status = models.CharField(max_length=20, default="pending")
+    reason = models.TextField(blank=True, default="")
+    reviewed_by = models.CharField(max_length=128, blank=True, default="")
+
+class EnergyAddressConfig(TimeStampedModel):
+    MODE_CHOICES = [("pen", "笔数地址"), ("smart", "智能托管地址"), ("hourly", "闪租地址")]
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    address = models.CharField(max_length=64)
+    private_key_encrypted = models.TextField(blank=True, default="")
+    mode = models.CharField(max_length=20, choices=MODE_CHOICES, default="pen")
+    max_energy = models.PositiveIntegerField(default=0)
+    used_energy = models.PositiveIntegerField(default=0)
+    enabled = models.BooleanField(default=True)

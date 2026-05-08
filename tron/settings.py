@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "energy",
     "membership",
     "finance",
+    "tgusers",
 ]
 
 MIDDLEWARE = [

@@ -10,15 +10,15 @@
 
 ## 旧前端页面盘点
 
-- TgAdvanceRecordList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgAdvanceRecordList.vue: 基础覆盖：预支记录 CRUD/API 已迁入。
 - TgConfigList.vue: 部分覆盖：系统配置 Settings.vue.
-- TgEnergyAgentRecordList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgEnergyAgentRecordList.vue: 基础覆盖：能量代理记录 CRUD/API 已迁入。
 - TgEnergyHourlyList.vue: 合并覆盖：能量套餐/能量订单.
 - TgEnergyHourlyTimeList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
 - TgEnergyHourlyTimePiceList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
-- TgEnergyIntelligentAddressList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgEnergyIntelligentAddressList.vue: 基础覆盖：能量地址配置 CRUD/API 已迁入。
 - TgEnergyIntelligentList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
-- TgEnergyPenAddressList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgEnergyPenAddressList.vue: 基础覆盖：能量地址配置 CRUD/API 已迁入。
 - TgEnergyPenFlashEntList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
 - TgEnergyPenList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
 - TgEnergyRecordList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
@@ -26,17 +26,17 @@
 - TgExchangeList.vue: 部分覆盖：兑换订单.
 - TgExchangeRecordList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
 - TgGroupList.vue: 部分覆盖：群组管理 ResourcePage.
-- TgListerAddressList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
-- TgMemberActivityList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgListerAddressList.vue: 基础覆盖：监听地址 CRUD/API 已迁入。
+- TgMemberActivityList.vue: 基础覆盖：会员活动 CRUD/API 已迁入。
 - TgMemberGoodsList.vue: 覆盖基础 CRUD：会员商品.
 - TgMemberOrderList.vue: 覆盖基础 CRUD：会员订单.
-- TgMemberRechargeList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgMemberRechargeList.vue: 基础覆盖：会员充值 CRUD/API 已迁入。
 - TgNumberOfOrdersList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
 - TgPromotionList.vue: 部分覆盖：推广文案 ResourcePage.
 - TgRechargeConfigList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
 - TgRunningWaterList.vue: 覆盖基础 CRUD：资金流水.
-- TgUserList.vue: 未覆盖：用户管理需新增 users app/model/API.
-- TgUserTopList.vue: 待迁移：需要新增 Vben 专用页面/后端模型接口.
+- TgUserList.vue: 基础覆盖：用户管理 CRUD/API 已迁入。
+- TgUserTopList.vue: 基础覆盖：用户排行 CRUD/API 已迁入。
 
 ## 后端待补齐方向
 

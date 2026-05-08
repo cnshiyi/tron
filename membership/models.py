@@ -18,3 +18,32 @@ class MemberOrder(TimeStampedModel):
     amount = models.DecimalField(max_digits=20, decimal_places=8, default=0)
     txid = models.CharField(max_length=128, blank=True, default="")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+
+class MemberRecharge(TimeStampedModel):
+    order_no = models.CharField(max_length=64, unique=True)
+    user_id = models.CharField(max_length=128)
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    amount = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    token_type = models.CharField(max_length=20, default="usdt")
+    txid = models.CharField(max_length=128, blank=True, default="")
+    status = models.CharField(max_length=20, default="pending")
+
+class MemberActivity(TimeStampedModel):
+    title = models.CharField(max_length=128)
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    activity_type = models.CharField(max_length=50, default="recharge")
+    reward_amount = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    reward_token = models.CharField(max_length=20, default="usdt")
+    start_at = models.DateTimeField(null=True, blank=True)
+    end_at = models.DateTimeField(null=True, blank=True)
+    enabled = models.BooleanField(default=True)
+    rule = models.TextField(blank=True, default="")
+
+class MemberCommission(TimeStampedModel):
+    user_id = models.CharField(max_length=128)
+    inviter_id = models.CharField(max_length=128, blank=True, default="")
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    source_order_no = models.CharField(max_length=64, blank=True, default="")
+    amount = models.DecimalField(max_digits=30, decimal_places=8, default=0)
+    token_type = models.CharField(max_length=20, default="usdt")
+    status = models.CharField(max_length=20, default="pending")
