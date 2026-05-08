@@ -25,7 +25,13 @@
 python3 start_backend.py
 ```
 
-macOS 也可以直接双击根目录的 `start_backend.command`。
+如果后端已经在运行，脚本不会直接退出，会持续健康检查并打印状态。想让脚本重启后端并接管 Django 实时请求日志：
+
+```bash
+python3 start_backend.py --restart
+```
+
+macOS 也可以直接双击根目录的 `start_backend.command`，它会使用 `--restart` 方式启动，窗口会持续打印 Django 日志。
 
 手动启动：
 
