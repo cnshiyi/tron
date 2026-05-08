@@ -1,0 +1,29 @@
+[project]
+name = "tron"
+version = "0.1.0"
+description = "TRON energy rental and Telegram bot admin platform"
+requires-python = ">=3.11"
+dependencies = [
+    "django>=5.2.14",
+    "djangorestframework>=3.16.1",
+    "django-cors-headers>=4.9.0",
+    "django-filter>=25.2",
+    "httpx>=0.28.1",
+    "python-dotenv>=1.2.1",
+    "python-telegram-bot>=22.5",
+    "tronpy>=0.6.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.1",
+    "pytest-django>=4.11.1",
+    "ruff>=0.14.8",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tron.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
+[tool.ruff]
+line-length = 100
