@@ -154,6 +154,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     actions: [
       { name: 'markPaid', label: '已支付', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入支付 Hash' },
       { name: 'delegating', label: '委托中', path: 'delegating', confirm: '确认标记委托中？' },
+      { name: 'delegate', label: 'SOHU委托演练', path: 'delegate', payload: { dry_run: true, mode: 'smart' }, confirm: '确认发起 SOHU 能量委托演练？不会真实请求外部接口。' },
       { name: 'success', label: '成功', path: 'success', promptField: 'txid', promptLabel: '请输入能量交易 Hash' },
       { name: 'fail', label: '失败', path: 'fail', danger: true, confirm: '确认标记失败？' },
     ],
