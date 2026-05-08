@@ -79,3 +79,8 @@ class EnergyRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnergyRecord
         fields = "__all__"
+
+
+class EnergyDelegateSerializer(serializers.Serializer):
+    dry_run = serializers.BooleanField(required=False, default=True)
+    mode = serializers.ChoiceField(choices=["smart", "times"], required=False, default="smart")

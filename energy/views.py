@@ -22,6 +22,7 @@ from .serializers import (
     EnergyAddressConfigSerializer,
     EnergyAgentRecordSerializer,
     EnergyCommissionSerializer,
+    EnergyDelegateSerializer,
     EnergyHourlyTimePriceSerializer,
     EnergyHourlyTimeSerializer,
     EnergyIntelligentPlanSerializer,
@@ -63,6 +64,22 @@ class EnergyOrderViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="mark-paid")
     def mark_paid(self, request, pk=None):
         return self._update_order("paid", "pay_txid", request.data.get("txid", ""))
+
+    @action(detail=True, methods=["post"], url_path="delegate")
+    def delegate(self, request, pk=None):
+        serializer = EnergyDelegateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order = self.get_object()
+        result = SohuEnergyService().delegate_order(order, **serializer.validated_data)
+        order.callback_payload = {"delegate_result": result}
+        if result.get("ok"):
+            order.status = "delegating"
+            if result.get("platform_order_id"):
+                order.platform_order_id = result["platform_order_id"]
+        else:
+            order.status = "failed"
+        order.save(update_fields=["status", "platform_order_id", "callback_payload", "updated_at"])
+        return Response({"order": self.get_serializer(order).data, "delegate": result})
 
     @action(detail=True, methods=["post"], url_path="delegating")
     def delegating(self, request, pk=None):

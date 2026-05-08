@@ -40,3 +40,23 @@ class SohuEnergyService:
         order.platform_order_id = payload.get("platformOrderId") or order.platform_order_id
         order.save(update_fields=["callback_payload", "status", "energy_txid", "platform_order_id", "updated_at"])
         return {"ok": True, "order_no": order_no, "status": order.status}
+
+
+    def delegate_order(self, order: EnergyOrder, dry_run: bool = True, mode: str = "smart") -> dict:
+        payload = {
+            "receiverAddress": order.receiver_address,
+            "amount": order.energy_amount,
+            "times": getattr(order.plan, "number_of_times", 0) if order.plan else 0,
+            "orderNo": order.order_no,
+            "mode": mode,
+        }
+        if dry_run or not getattr(settings, "SOHU_SEND_ENABLED", False):
+            return {"ok": True, "dry_run": True, "platform_order_id": f"dry-{order.order_no}", "payload": payload}
+        try:
+            if mode == "times":
+                data = self.delegate_times(order.receiver_address, payload["times"] or 1, order.order_no)
+            else:
+                data = self.delegate_smart(order.receiver_address, order.energy_amount, order.order_no)
+            return {"ok": bool(data.get("ok", True)), "data": data, "platform_order_id": str(data.get("orderId") or data.get("platformOrderId") or data.get("data", {}).get("orderId") or "")}
+        except Exception as exc:  # pragma: no cover - network protection
+            return {"ok": False, "error": str(exc), "payload": payload}
