@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Button, Card, Form, FormItem, Input, InputNumber, Modal, Popconfirm, Space, Switch, Table, Textarea, message } from 'ant-design-vue';
-import { createResource, deleteResource, listResource, resourceConfigs, updateResource } from '#/api/tron';
+import { bulkCreateBots, createResource, deleteResource, listResource, resourceConfigs, updateResource } from '#/api/tron';
 
 const props = defineProps<{ key?: string }>();
 const route = useRoute();
@@ -17,6 +17,9 @@ const keyword = ref('');
 const modalOpen = ref(false);
 const saving = ref(false);
 const form = reactive<Record<string, any>>({});
+const bulkOpen = ref(false);
+const bulkSaving = ref(false);
+const bulkForm = reactive({ content: '', default_owner_user_id: '', webhook_enabled: true, broadcast_enabled: true });
 
 const columns = computed(() => [
   ...config.value.columns.map((col) => ({ ...col, ellipsis: col.ellipsis ?? true })),
@@ -69,6 +72,21 @@ async function remove(record: Record<string, any>) {
   message.success('已删除');
   await load();
 }
+async function saveBulkBots() {
+  bulkSaving.value = true;
+  try {
+    const result = await bulkCreateBots({ ...bulkForm });
+    message.success(`批量添加完成：新增 ${result.created_count} 个，跳过 ${result.skipped?.length || 0} 个，错误 ${result.errors?.length || 0} 个`);
+    bulkOpen.value = false;
+    bulkForm.content = '';
+    await load();
+  } catch (e: any) {
+    message.error(e.message || String(e));
+  } finally {
+    bulkSaving.value = false;
+  }
+}
+
 
 watch(keyName, () => { page.value = 1; load(); });
 onMounted(load);
@@ -81,6 +99,7 @@ onMounted(load);
         <Space>
           <Input v-model:value="keyword" allow-clear placeholder="搜索" style="width: 220px" @press-enter="load" />
           <Button @click="load">刷新/查询</Button>
+          <Button v-if="keyName === 'bots'" @click="bulkOpen = true">批量添加机器人</Button>
           <Button type="primary" @click="add">新增</Button>
         </Space>
       </template>
@@ -118,6 +137,28 @@ onMounted(load);
           <Textarea v-else-if="field.type === 'textarea'" v-model:value="form[field.name]" :rows="4" />
           <Input v-else v-model:value="form[field.name]" />
         </FormItem>
+      </Form>
+    </Modal>
+
+    <Modal v-model:open="bulkOpen" title="批量添加机器人" :confirm-loading="bulkSaving" width="820px" @ok="saveBulkBots">
+      <Form layout="vertical">
+        <FormItem label="默认归属用户ID">
+          <Input v-model:value="bulkForm.default_owner_user_id" placeholder="可选，未填写则为空" />
+        </FormItem>
+        <FormItem label="启用Webhook">
+          <Switch v-model:checked="bulkForm.webhook_enabled" />
+        </FormItem>
+        <FormItem label="启用群组播报">
+          <Switch v-model:checked="bulkForm.broadcast_enabled" />
+        </FormItem>
+        <FormItem label="机器人列表">
+          <Textarea
+            v-model:value="bulkForm.content"
+            :rows="10"
+            placeholder="每行一个机器人，支持：token 或 robot_id,token 或 robot_id|token|username|昵称|归属用户ID"
+          />
+        </FormItem>
+        <p class="text-gray-500">示例：123456:AAxxToken 或 bot001,123456:AAxxToken 或 bot001|123456:AAxxToken|my_bot|机器人昵称|10001</p>
       </Form>
     </Modal>
   </div>

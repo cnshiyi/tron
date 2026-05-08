@@ -59,6 +59,18 @@ export function deleteResource(endpoint: string, id: string | number) {
   return request(`${endpoint}/${id}/`, { method: 'DELETE' });
 }
 
+export function bulkCreateBots(data: {
+  broadcast_enabled?: boolean;
+  content: string;
+  default_owner_user_id?: string;
+  webhook_enabled?: boolean;
+}) {
+  return request<{ created_count: number; created: any[]; skipped: any[]; errors: any[] }>(
+    '/bots/bulk-create/',
+    { method: 'POST', body: JSON.stringify(data) },
+  );
+}
+
 export async function getSingleton(endpoint: string, defaults: Record<string, any> = {}) {
   const list = await listResource(endpoint, { page_size: 1 });
   return list.results[0] || defaults;
