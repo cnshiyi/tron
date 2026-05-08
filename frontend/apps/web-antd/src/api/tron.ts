@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_TRON_API_URL || 'http://127.0.0.1:8000/api';
+const API_BASE = import.meta.env.VITE_TRON_API_URL || 'http://127.0.0.1:18001/api';
 
 export interface ListResult<T = Record<string, any>> {
   count: number;
