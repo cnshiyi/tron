@@ -3,6 +3,7 @@ import { baseRequestClient, requestClient } from '#/api/request';
 export namespace AuthApi {
   /** 登录接口参数 */
   export interface LoginParams {
+    google_code?: string;
     password?: string;
     username?: string;
   }

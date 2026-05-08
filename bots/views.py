@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
-from .models import Bot, Promotion
-from .serializers import BotSerializer, PromotionSerializer
+from .models import Bot, Promotion, BotGroup
+from .serializers import BotSerializer, PromotionSerializer, BotGroupSerializer
 from .services import TelegramBotService
 
 class BotViewSet(viewsets.ModelViewSet):
@@ -15,6 +15,12 @@ class PromotionViewSet(viewsets.ModelViewSet):
     serializer_class = PromotionSerializer
     filterset_fields = ["bot", "position", "type", "auto_reply"]
     search_fields = ["title", "command", "content"]
+
+class BotGroupViewSet(viewsets.ModelViewSet):
+    queryset = BotGroup.objects.select_related("bot").all()
+    serializer_class = BotGroupSerializer
+    filterset_fields = ["bot", "chat_id", "broadcast_enabled"]
+    search_fields = ["chat_id", "title"]
 
 @csrf_exempt
 def telegram_webhook(request, bot_id: str):
