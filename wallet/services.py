@@ -21,3 +21,24 @@ class TronGridService:
 
     def normalize_usdt_amount(self, raw_value: str | int) -> Decimal:
         return Decimal(str(raw_value)) / Decimal("1000000")
+
+
+    def list_trc20_transactions(self, address: str, limit: int = 20) -> list[dict]:
+        with httpx.Client(timeout=15) as client:
+            data = client.get(
+                f"{self.base_url}/v1/accounts/{address}/transactions/trc20",
+                params={"limit": limit, "only_confirmed": "true", "contract_address": TRC20_USDT_CONTRACT},
+                headers=self.headers,
+            ).json()
+        return data.get("data", [])
+
+    def parse_usdt_transfer(self, item: dict) -> dict:
+        return {
+            "txid": item.get("transaction_id") or item.get("txID") or "",
+            "from_address": item.get("from") or item.get("from_address") or "",
+            "to_address": item.get("to") or item.get("to_address") or "",
+            "amount": self.normalize_usdt_amount(item.get("value", 0)),
+            "token_type": "usdt",
+            "confirmed": True,
+            "raw": item,
+        }

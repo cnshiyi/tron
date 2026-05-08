@@ -23,6 +23,10 @@ class ChainTransaction(TimeStampedModel):
     token_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default="usdt")
     confirmed = models.BooleanField(default=False)
     raw = models.JSONField(default=dict, blank=True)
+    listen_address = models.CharField(max_length=64, blank=True, default="")
+    processed = models.BooleanField(default=False)
+    matched_business = models.CharField(max_length=50, blank=True, default="")
+    ref_no = models.CharField(max_length=128, blank=True, default="")
 
 class ListenAddress(TimeStampedModel):
     bot_id = models.CharField(max_length=128, blank=True, default="")

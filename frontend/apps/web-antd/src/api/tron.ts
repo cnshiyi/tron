@@ -217,11 +217,18 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     title: '监听地址', endpoint: '/listen-addresses', description: '链上充值/兑换监听地址',
     columns: [{ title: '地址', dataIndex: 'address' }, { title: '标签', dataIndex: 'label' }, { title: '机器人', dataIndex: 'bot_id' }, { title: '币种', dataIndex: 'token_type' }, { title: '最小金额', dataIndex: 'min_amount' }, { title: '启用', dataIndex: 'enabled' }],
     fields: [{ label: '地址', name: 'address' }, { label: '标签', name: 'label' }, { label: '机器人ID', name: 'bot_id' }, { label: '币种', name: 'token_type' }, { label: '最小金额', name: 'min_amount', type: 'number' }, { label: '启用', name: 'enabled', type: 'boolean' }, { label: '最后扫描Hash', name: 'last_scanned_txid' }],
+    actions: [
+      { name: 'scanDry', label: '扫描', path: 'scan', payload: { apply: false, limit: 20 }, confirm: '确认扫描该地址最近交易？默认只入库不处理订单。' },
+      { name: 'scanApply', label: '扫描并处理', path: 'scan', payload: { apply: true, limit: 20 }, confirm: '确认扫描并自动匹配充值/兑换订单？' },
+    ],
   },
   transactions: {
     title: '链上交易', endpoint: '/transactions', description: 'TRX/USDT/能量链上交易记录',
-    columns: [{ title: 'Hash', dataIndex: 'txid' }, { title: 'From', dataIndex: 'from_address' }, { title: 'To', dataIndex: 'to_address' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '确认', dataIndex: 'confirmed' }],
-    fields: [{ label: 'Hash', name: 'txid' }, { label: 'From', name: 'from_address' }, { label: 'To', name: 'to_address' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '确认', name: 'confirmed', type: 'boolean' }],
+    columns: [{ title: 'Hash', dataIndex: 'txid' }, { title: 'From', dataIndex: 'from_address' }, { title: 'To', dataIndex: 'to_address' }, { title: '金额', dataIndex: 'amount' }, { title: '币种', dataIndex: 'token_type' }, { title: '确认', dataIndex: 'confirmed' }, { title: '已处理', dataIndex: 'processed' }, { title: '业务', dataIndex: 'matched_business' }, { title: '单号', dataIndex: 'ref_no' }],
+    fields: [{ label: 'Hash', name: 'txid' }, { label: 'From', name: 'from_address' }, { label: 'To', name: 'to_address' }, { label: '监听地址', name: 'listen_address' }, { label: '金额', name: 'amount', type: 'number' }, { label: '币种', name: 'token_type' }, { label: '确认', name: 'confirmed', type: 'boolean' }, { label: '已处理', name: 'processed', type: 'boolean' }, { label: '匹配业务', name: 'matched_business' }, { label: '关联单号', name: 'ref_no' }],
+    actions: [
+      { name: 'process', label: '处理匹配', path: 'process', confirm: '确认按金额/Hash 匹配并处理业务订单？' },
+    ],
   },
   energyAgentRecords: {
     title: '能量代理记录', endpoint: '/energy/agent-records', description: '代理能量订单、成本与利润',

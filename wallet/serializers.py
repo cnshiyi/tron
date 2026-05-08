@@ -15,3 +15,8 @@ class ListenAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = ListenAddress
         fields = "__all__"
+
+
+class ListenAddressScanSerializer(serializers.Serializer):
+    apply = serializers.BooleanField(required=False, default=False)
+    limit = serializers.IntegerField(required=False, min_value=1, max_value=200, default=20)
