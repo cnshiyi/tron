@@ -4,9 +4,9 @@ import { useRoute } from 'vue-router';
 import { Button, Card, Form, FormItem, Input, InputNumber, Modal, Popconfirm, Space, Switch, Table, Textarea, message } from 'ant-design-vue';
 import { actionResource, bulkCreateBots, createResource, deleteResource, getResourceConfig, listResource, loadUiText, uiText, updateResource } from '#/api/tron';
 
-const props = defineProps<{ key?: string }>();
+const props = defineProps<{ resourceKey?: string }>();
 const route = useRoute();
-const keyName = computed(() => String(props.key || route.params.key || 'bots'));
+const keyName = computed(() => String(props.resourceKey || route.params.key || 'bots'));
 const textVersion = ref(0);
 const config = computed(() => {
   textVersion.value;
