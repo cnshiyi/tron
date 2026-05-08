@@ -34,3 +34,8 @@ class RechargeConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = RechargeConfig
         fields = "__all__"
+
+
+class WithdrawalPayoutSerializer(serializers.Serializer):
+    dry_run = serializers.BooleanField(required=False, default=True)
+    reviewed_by = serializers.CharField(max_length=128, required=False, allow_blank=True, default="admin")

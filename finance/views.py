@@ -4,12 +4,14 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Balance, RechargeConfig, RunningWater, Withdrawal
+from .services import WithdrawalPayoutService
 from .serializers import (
     BalanceAdjustSerializer,
     BalanceSerializer,
     RechargeConfigSerializer,
     RunningWaterSerializer,
     WithdrawalPaidSerializer,
+    WithdrawalPayoutSerializer,
     WithdrawalReviewSerializer,
     WithdrawalSerializer,
 )
@@ -85,6 +87,19 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
         serializer = WithdrawalPaidSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return self._set_status("paid", serializer.validated_data.get("reviewed_by", "admin"), serializer.validated_data["txid"])
+
+    @action(detail=True, methods=["post"], url_path="payout")
+    def payout(self, request, pk=None):
+        serializer = WithdrawalPayoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        withdrawal = self.get_object()
+        result = WithdrawalPayoutService().payout(withdrawal, dry_run=serializer.validated_data.get("dry_run", True))
+        if result.get("ok"):
+            withdrawal.status = "paid"
+            withdrawal.txid = result.get("txid", withdrawal.txid)
+            withdrawal.reviewed_by = serializer.validated_data.get("reviewed_by") or withdrawal.reviewed_by or "admin"
+            withdrawal.save(update_fields=["status", "txid", "reviewed_by", "updated_at"])
+        return Response({"withdrawal": self.get_serializer(withdrawal).data, "payout": result})
 
 class RechargeConfigViewSet(viewsets.ModelViewSet):
     queryset = RechargeConfig.objects.all().order_by("-id")
