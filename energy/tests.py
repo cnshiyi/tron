@@ -152,3 +152,59 @@ class StakingServiceTests(TestCase):
         self.assertEqual(staking_order.status, "reclaimed")
         self.assertEqual(self.account.delegated_balance_sun, 0)
         self.assertEqual(self.account.used_energy, 0)
+
+    def test_dry_run_delegate_does_not_consume_inventory_or_mark_order_delegating(self):
+        order = EnergyOrder.objects.create(
+            order_no="E1004",
+            receiver_address="TReceiverAddressdryrun",
+            energy_amount=32_000,
+            trx_amount=Decimal("3"),
+            status="paid",
+        )
+
+        result = TronStakingService(client=FakeClient()).delegate_energy_order(order, broadcast=False)
+
+        self.assertTrue(result["ok"])
+        self.account.refresh_from_db()
+        order.refresh_from_db()
+        staking_order = StakingOrder.objects.get(order_no="E1004")
+        self.assertEqual(self.account.delegated_balance_sun, 0)
+        self.assertEqual(self.account.used_energy, 0)
+        self.assertEqual(order.status, "paid")
+        self.assertEqual(staking_order.status, "pending")
+        self.assertEqual(staking_order.delegate_txid, result["txid"])
+
+    def test_reclaim_due_orders_only_reclaims_success_expired_auto_reclaim_orders(self):
+        from django.utils import timezone
+        from datetime import timedelta
+
+        due_order = StakingOrder.objects.create(
+            order_no="E1005",
+            account=self.account,
+            receiver_address="TReceiverAddressdue",
+            energy_amount=32_000,
+            delegate_balance_sun=3_000_000,
+            status="success",
+            expire_at=timezone.now() - timedelta(minutes=1),
+        )
+        StakingOrder.objects.create(
+            order_no="E1006",
+            account=self.account,
+            receiver_address="TReceiverAddressfuture",
+            energy_amount=32_000,
+            delegate_balance_sun=3_000_000,
+            status="success",
+            expire_at=timezone.now() + timedelta(hours=1),
+        )
+        self.account.delegated_balance_sun = 6_000_000
+        self.account.used_energy = 64_000
+        self.account.save(update_fields=["delegated_balance_sun", "used_energy"])
+
+        result = TronStakingService(client=FakeClient()).reclaim_due_orders(broadcast=True)
+
+        self.assertEqual(result["total"], 1)
+        due_order.refresh_from_db()
+        self.account.refresh_from_db()
+        self.assertEqual(due_order.status, "reclaimed")
+        self.assertEqual(self.account.delegated_balance_sun, 3_000_000)
+        self.assertEqual(self.account.used_energy, 32_000)

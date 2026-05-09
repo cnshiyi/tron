@@ -2,6 +2,7 @@ from decimal import Decimal
 import re
 
 from django.conf import settings
+from django.utils import timezone
 import httpx
 from tronpy import Tron
 from tronpy.keys import PrivateKey
@@ -198,7 +199,7 @@ class TronStakingService:
             raise ValueError("质押账户可用能量不足")
         builder = self.client.trx.delegate_resource(account.address, receiver_address, balance_sun, account.resource, lock=lock, lock_period=lock_period)
         result = self._build_sign_broadcast(builder, account, "delegate", balance_sun, receiver_address, staking_order, broadcast)
-        if result["ok"]:
+        if result["ok"] and broadcast:
             account.delegated_balance_sun += balance_sun
             account.used_energy += int(energy_amount or 0)
             account.save(update_fields=["delegated_balance_sun", "used_energy", "updated_at"])
@@ -210,7 +211,7 @@ class TronStakingService:
         account = staking_order.account
         builder = self.client.trx.undelegate_resource(account.address, staking_order.receiver_address, int(staking_order.delegate_balance_sun), staking_order.resource)
         result = self._build_sign_broadcast(builder, account, "undelegate", int(staking_order.delegate_balance_sun), staking_order.receiver_address, staking_order, broadcast)
-        if result["ok"]:
+        if result["ok"] and broadcast:
             account.delegated_balance_sun = max(0, account.delegated_balance_sun - int(staking_order.delegate_balance_sun))
             account.used_energy = max(0, account.used_energy - int(staking_order.energy_amount or 0))
             account.save(update_fields=["delegated_balance_sun", "used_energy", "updated_at"])
@@ -237,15 +238,15 @@ class TronStakingService:
         staking_order.delegate_balance_sun = balance_sun
         staking_order.lock = lock
         staking_order.lock_period = lock_period
-        staking_order.status = "delegating"
+        staking_order.status = "delegating" if broadcast else "pending"
         staking_order.save()
         result = self.delegate_resource(account, order.receiver_address, balance_sun, order.energy_amount, order.order_no, lock, lock_period, broadcast, staking_order)
         staking_order.delegate_txid = result.get("txid", "")
         staking_order.raw_payload = result
-        staking_order.status = "delegating" if result.get("ok") else "failed"
+        staking_order.status = ("delegating" if broadcast else "pending") if result.get("ok") else "failed"
         staking_order.error_message = result.get("error", "")
         staking_order.save(update_fields=["delegate_txid", "raw_payload", "status", "error_message", "updated_at"])
-        order.status = "delegating" if result.get("ok") else "failed"
+        order.status = ("delegating" if broadcast else order.status) if result.get("ok") else "failed"
         order.energy_txid = result.get("txid", order.energy_txid)
         order.platform_order_id = f"staking:{staking_order.order_no}"
         order.callback_payload = {**(order.callback_payload or {}), "staking_delegate": result}
@@ -262,3 +263,23 @@ class TronStakingService:
         staking_order.error_message = result.get("error", "")
         staking_order.save(update_fields=["undelegate_txid", "raw_payload", "status", "error_message", "updated_at"])
         return {**result, "staking_order_id": staking_order.id}
+
+    def reclaim_due_orders(self, broadcast: bool = False, now=None, limit: int = 100) -> dict:
+        now = now or timezone.now()
+        qs = StakingOrder.objects.select_related("account").filter(
+            status="success",
+            expire_at__isnull=False,
+            expire_at__lte=now,
+            account__auto_reclaim=True,
+            account__enabled=True,
+        ).order_by("expire_at", "id")[: int(limit)]
+        results = []
+        for order in qs:
+            try:
+                results.append({"order_no": order.order_no, **self.reclaim_order(order, broadcast=broadcast)})
+            except Exception as exc:  # pragma: no cover - defensive batch isolation
+                order.status = "failed"
+                order.error_message = str(exc)
+                order.save(update_fields=["status", "error_message", "updated_at"])
+                results.append({"order_no": order.order_no, "ok": False, "error": str(exc)})
+        return {"ok": True, "total": len(results), "results": results}

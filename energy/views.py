@@ -38,6 +38,7 @@ from .serializers import (
     StakingAccountSerializer,
     StakingDelegateOrderSerializer,
     StakingOrderSerializer,
+    StakingReclaimDueSerializer,
     StakingStakeSerializer,
     StakingTransactionSerializer,
 )
@@ -245,6 +246,13 @@ class StakingOrderViewSet(viewsets.ModelViewSet):
     serializer_class = StakingOrderSerializer
     filterset_fields = ["status", "resource", "account"]
     search_fields = ["order_no", "receiver_address", "delegate_txid", "undelegate_txid"]
+
+    @action(detail=False, methods=["post"], url_path="reclaim-due")
+    def reclaim_due(self, request):
+        serializer = StakingReclaimDueSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = TronStakingService().reclaim_due_orders(**serializer.validated_data)
+        return Response(result)
 
     @action(detail=True, methods=["post"], url_path="reclaim")
     def reclaim(self, request, pk=None):

@@ -119,3 +119,8 @@ class StakingDelegateOrderSerializer(serializers.Serializer):
     broadcast = serializers.BooleanField(required=False, default=False)
     lock = serializers.BooleanField(required=False, default=False)
     lock_period = serializers.IntegerField(required=False, min_value=0, allow_null=True)
+
+
+class StakingReclaimDueSerializer(serializers.Serializer):
+    broadcast = serializers.BooleanField(required=False, default=False)
+    limit = serializers.IntegerField(required=False, default=100, min_value=1, max_value=500)
