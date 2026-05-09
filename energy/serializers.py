@@ -13,6 +13,9 @@ from .models import (
     EnergyPlan,
     EnergyRecord,
     NumberOfOrders,
+    StakingAccount,
+    StakingOrder,
+    StakingTransaction,
 )
 
 class EnergyPlanSerializer(serializers.ModelSerializer):
@@ -84,3 +87,35 @@ class EnergyRecordSerializer(serializers.ModelSerializer):
 class EnergyDelegateSerializer(serializers.Serializer):
     dry_run = serializers.BooleanField(required=False, default=True)
     mode = serializers.ChoiceField(choices=["smart", "times"], required=False, default="smart")
+
+
+class StakingAccountSerializer(serializers.ModelSerializer):
+    available_balance_sun = serializers.IntegerField(read_only=True)
+    available_energy = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = StakingAccount
+        fields = "__all__"
+
+
+class StakingOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StakingOrder
+        fields = "__all__"
+
+
+class StakingTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StakingTransaction
+        fields = "__all__"
+
+
+class StakingStakeSerializer(serializers.Serializer):
+    amount_sun = serializers.IntegerField(min_value=1)
+    broadcast = serializers.BooleanField(required=False, default=False)
+
+
+class StakingDelegateOrderSerializer(serializers.Serializer):
+    broadcast = serializers.BooleanField(required=False, default=False)
+    lock = serializers.BooleanField(required=False, default=False)
+    lock_period = serializers.IntegerField(required=False, min_value=0, allow_null=True)

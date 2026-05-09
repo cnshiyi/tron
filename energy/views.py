@@ -16,6 +16,9 @@ from .models import (
     EnergyPlan,
     EnergyRecord,
     NumberOfOrders,
+    StakingAccount,
+    StakingOrder,
+    StakingTransaction,
 )
 from .serializers import (
     AdvanceRecordSerializer,
@@ -32,8 +35,13 @@ from .serializers import (
     EnergyPlanSerializer,
     EnergyRecordSerializer,
     NumberOfOrdersSerializer,
+    StakingAccountSerializer,
+    StakingDelegateOrderSerializer,
+    StakingOrderSerializer,
+    StakingStakeSerializer,
+    StakingTransactionSerializer,
 )
-from .services import SohuEnergyService
+from .services import SohuEnergyService, TronStakingService
 
 class EnergyPlanViewSet(viewsets.ModelViewSet):
     queryset = EnergyPlan.objects.all().order_by("sort", "id")
@@ -80,6 +88,14 @@ class EnergyOrderViewSet(viewsets.ModelViewSet):
             order.status = "failed"
         order.save(update_fields=["status", "platform_order_id", "callback_payload", "updated_at"])
         return Response({"order": self.get_serializer(order).data, "delegate": result})
+
+    @action(detail=True, methods=["post"], url_path="staking-delegate")
+    def staking_delegate(self, request, pk=None):
+        serializer = StakingDelegateOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order = self.get_object()
+        result = TronStakingService().delegate_energy_order(order, **serializer.validated_data)
+        return Response({"order": self.get_serializer(order).data, "staking": result})
 
     @action(detail=True, methods=["post"], url_path="delegating")
     def delegating(self, request, pk=None):
@@ -195,3 +211,51 @@ class EnergyCallbackView(APIView):
     permission_classes = []
     def post(self, request):
         return Response(SohuEnergyService().handle_callback(request.data))
+
+
+class StakingAccountViewSet(viewsets.ModelViewSet):
+    queryset = StakingAccount.objects.all().order_by("-id")
+    serializer_class = StakingAccountSerializer
+    filterset_fields = ["bot_id", "enabled", "resource", "permission_id"]
+    search_fields = ["name", "address"]
+
+    @action(detail=True, methods=["post"], url_path="sync")
+    def sync(self, request, pk=None):
+        account = self.get_object()
+        payload = TronStakingService().sync_account(account)
+        return Response({"account": self.get_serializer(account).data, "payload": payload})
+
+    @action(detail=True, methods=["post"], url_path="stake")
+    def stake(self, request, pk=None):
+        serializer = StakingStakeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = TronStakingService().stake_trx(self.get_object(), **serializer.validated_data)
+        return Response(result)
+
+    @action(detail=True, methods=["post"], url_path="unstake")
+    def unstake(self, request, pk=None):
+        serializer = StakingStakeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = TronStakingService().unstake_trx(self.get_object(), **serializer.validated_data)
+        return Response(result)
+
+
+class StakingOrderViewSet(viewsets.ModelViewSet):
+    queryset = StakingOrder.objects.select_related("account", "energy_order").all().order_by("-id")
+    serializer_class = StakingOrderSerializer
+    filterset_fields = ["status", "resource", "account"]
+    search_fields = ["order_no", "receiver_address", "delegate_txid", "undelegate_txid"]
+
+    @action(detail=True, methods=["post"], url_path="reclaim")
+    def reclaim(self, request, pk=None):
+        serializer = StakingDelegateOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = TronStakingService().reclaim_order(self.get_object(), broadcast=serializer.validated_data["broadcast"])
+        return Response({"order": self.get_serializer(self.get_object()).data, "reclaim": result})
+
+
+class StakingTransactionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = StakingTransaction.objects.select_related("account", "staking_order").all().order_by("-id")
+    serializer_class = StakingTransactionSerializer
+    filterset_fields = ["operation", "status", "account", "staking_order", "permission_id"]
+    search_fields = ["txid", "receiver_address"]

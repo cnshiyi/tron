@@ -192,9 +192,33 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       { name: 'markPaid', label: '已支付', path: 'mark-paid', promptField: 'txid', promptLabel: '请输入支付 Hash' },
       { name: 'delegating', label: '委托中', path: 'delegating', confirm: '确认标记委托中？' },
       { name: 'delegate', label: 'SOHU委托演练', path: 'delegate', payload: { dry_run: true, mode: 'smart' }, confirm: '确认发起 SOHU 能量委托演练？不会真实请求外部接口。' },
+      { name: 'stakingDelegate', label: '原生质押委托演练', path: 'staking-delegate', payload: { broadcast: false }, confirm: '确认使用自有质押账户构建多签委托交易？默认不广播。' },
       { name: 'success', label: '成功', path: 'success', promptField: 'txid', promptLabel: '请输入能量交易 Hash' },
       { name: 'fail', label: '失败', path: 'fail', danger: true, confirm: '确认标记失败？' },
     ],
+  },
+  stakingAccounts: {
+    title: '质押账户', endpoint: '/staking/accounts', description: 'TRON 原生质押地址、Active Permission 多签、可委托额度和能量库存',
+    columns: [{ title: '名称', dataIndex: 'name' }, { title: '地址', dataIndex: 'address' }, { title: 'PermissionID', dataIndex: 'permission_id' }, { title: '需签名数', dataIndex: 'required_signature_count' }, { title: '已质押SUN', dataIndex: 'frozen_balance_sun' }, { title: '可委托SUN', dataIndex: 'available_balance_sun' }, { title: '可用能量', dataIndex: 'available_energy' }, { title: '启用', dataIndex: 'enabled' }],
+    fields: [{ label: '名称', name: 'name' }, { label: '机器人ID', name: 'bot_id' }, { label: '质押地址', name: 'address' }, { label: '主签私钥/密文', name: 'private_key_encrypted', type: 'textarea' }, { label: '多签私钥/密文（一行一个）', name: 'multisig_private_keys', type: 'textarea' }, { label: 'Active Permission ID', name: 'permission_id', type: 'number' }, { label: '需签名数', name: 'required_signature_count', type: 'number' }, { label: '资源类型', name: 'resource' }, { label: '已质押SUN', name: 'frozen_balance_sun', type: 'number' }, { label: '最大可委托SUN', name: 'max_delegable_sun', type: 'number' }, { label: '已委托SUN', name: 'delegated_balance_sun', type: 'number' }, { label: '最大能量', name: 'max_energy', type: 'number' }, { label: '已用能量', name: 'used_energy', type: 'number' }, { label: '保留能量', name: 'min_reserve_energy', type: 'number' }, { label: '自动回收', name: 'auto_reclaim', type: 'boolean' }, { label: '启用', name: 'enabled', type: 'boolean' }],
+    actions: [
+      { name: 'sync', label: '同步链上', path: 'sync', confirm: '确认从 TRON 链上同步账户资源？' },
+      { name: 'stakeDry', label: '质押演练', path: 'stake', payload: { amount_sun: 1000000, broadcast: false }, confirm: '确认构建 1 TRX 质押交易？默认不广播。' },
+      { name: 'unstakeDry', label: '解押演练', path: 'unstake', payload: { amount_sun: 1000000, broadcast: false }, confirm: '确认构建 1 TRX 解押交易？默认不广播。' },
+    ],
+  },
+  stakingOrders: {
+    title: '质押委托订单', endpoint: '/staking/orders', description: '本系统自有质押地址委托给用户的订单和到期回收记录',
+    columns: [{ title: '订单号', dataIndex: 'order_no' }, { title: '账户', dataIndex: 'account' }, { title: '接收地址', dataIndex: 'receiver_address' }, { title: '能量', dataIndex: 'energy_amount' }, { title: '委托SUN', dataIndex: 'delegate_balance_sun' }, { title: '状态', dataIndex: 'status' }, { title: '委托Hash', dataIndex: 'delegate_txid' }, { title: '回收Hash', dataIndex: 'undelegate_txid' }],
+    fields: [{ label: '订单号', name: 'order_no' }, { label: '能量订单ID', name: 'energy_order', type: 'number' }, { label: '质押账户ID', name: 'account', type: 'number' }, { label: '接收地址', name: 'receiver_address' }, { label: '资源类型', name: 'resource' }, { label: '能量', name: 'energy_amount', type: 'number' }, { label: '委托SUN', name: 'delegate_balance_sun', type: 'number' }, { label: '锁定', name: 'lock', type: 'boolean' }, { label: '锁定周期', name: 'lock_period', type: 'number' }, { label: '状态', name: 'status' }, { label: '委托Hash', name: 'delegate_txid' }, { label: '回收Hash', name: 'undelegate_txid' }, { label: '到期时间', name: 'expire_at' }, { label: '错误信息', name: 'error_message', type: 'textarea' }],
+    actions: [
+      { name: 'reclaimDry', label: '回收演练', path: 'reclaim', payload: { broadcast: false }, confirm: '确认构建回收交易？默认不广播。' },
+    ],
+  },
+  stakingTransactions: {
+    title: '质押链上交易', endpoint: '/staking/transactions', description: '质押、解押、委托、回收的多签交易记录',
+    columns: [{ title: '操作', dataIndex: 'operation' }, { title: '账户', dataIndex: 'account' }, { title: '接收地址', dataIndex: 'receiver_address' }, { title: '金额SUN', dataIndex: 'amount_sun' }, { title: 'PermissionID', dataIndex: 'permission_id' }, { title: '签名数', dataIndex: 'signature_count' }, { title: '状态', dataIndex: 'status' }, { title: 'Hash', dataIndex: 'txid' }],
+    fields: [{ label: '操作', name: 'operation' }, { label: '资源类型', name: 'resource' }, { label: '金额SUN', name: 'amount_sun', type: 'number' }, { label: '接收地址', name: 'receiver_address' }, { label: 'PermissionID', name: 'permission_id', type: 'number' }, { label: '签名数', name: 'signature_count', type: 'number' }, { label: 'Hash', name: 'txid' }, { label: '状态', name: 'status' }, { label: '错误信息', name: 'error_message', type: 'textarea' }],
   },
   memberGoods: {
     title: '会员商品', endpoint: '/membership/goods', description: '会员套餐、费率区间',

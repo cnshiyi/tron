@@ -22,6 +22,9 @@ from energy.views import (
     EnergyPlanViewSet,
     EnergyRecordViewSet,
     NumberOfOrdersViewSet,
+    StakingAccountViewSet,
+    StakingOrderViewSet,
+    StakingTransactionViewSet,
 )
 from membership.views import (
     MemberActivityViewSet,
@@ -61,6 +64,9 @@ router.register(r"energy/number-of-orders", NumberOfOrdersViewSet)
 router.register(r"energy/pen-flash-entries", EnergyPenFlashEntryViewSet)
 router.register(r"energy/intelligent-plans", EnergyIntelligentPlanViewSet)
 router.register(r"energy/records", EnergyRecordViewSet)
+router.register(r"staking/accounts", StakingAccountViewSet)
+router.register(r"staking/orders", StakingOrderViewSet)
+router.register(r"staking/transactions", StakingTransactionViewSet)
 router.register(r"membership/goods", MemberGoodsViewSet)
 router.register(r"membership/orders", MemberOrderViewSet)
 router.register(r"membership/recharges", MemberRechargeViewSet)

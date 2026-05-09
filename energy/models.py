@@ -131,3 +131,70 @@ class EnergyRecord(TimeStampedModel):
     amount_trx = models.DecimalField(max_digits=30, decimal_places=8, default=0)
     txid = models.CharField(max_length=128, blank=True, default="")
     status = models.CharField(max_length=20, default="pending")
+
+
+class StakingAccount(TimeStampedModel):
+    """TRON 原生质押账户，支持 active permission 多签调用。"""
+
+    RESOURCE_CHOICES = [("ENERGY", "能量"), ("BANDWIDTH", "带宽")]
+    name = models.CharField(max_length=100, blank=True, default="")
+    bot_id = models.CharField(max_length=128, blank=True, default="")
+    address = models.CharField(max_length=64, unique=True, verbose_name="质押地址")
+    private_key_encrypted = models.TextField(blank=True, default="", verbose_name="主签私钥/密文")
+    multisig_private_keys = models.TextField(blank=True, default="", verbose_name="多签私钥/密文，一行一个")
+    permission_id = models.PositiveIntegerField(default=0, verbose_name="Active Permission ID，0 表示 owner/default")
+    required_signature_count = models.PositiveIntegerField(default=1, verbose_name="本系统签名数量要求")
+    resource = models.CharField(max_length=20, choices=RESOURCE_CHOICES, default="ENERGY")
+    frozen_balance_sun = models.BigIntegerField(default=0, verbose_name="已质押 SUN")
+    max_delegable_sun = models.BigIntegerField(default=0, verbose_name="最大可委托 SUN")
+    delegated_balance_sun = models.BigIntegerField(default=0, verbose_name="已委托 SUN")
+    max_energy = models.PositiveIntegerField(default=0, verbose_name="最大能量")
+    used_energy = models.PositiveIntegerField(default=0, verbose_name="已用能量")
+    min_reserve_energy = models.PositiveIntegerField(default=0, verbose_name="保留能量")
+    auto_reclaim = models.BooleanField(default=True)
+    enabled = models.BooleanField(default=True)
+    last_sync_payload = models.JSONField(default=dict, blank=True)
+
+    @property
+    def available_balance_sun(self):
+        return max(0, int(self.max_delegable_sun or self.frozen_balance_sun) - int(self.delegated_balance_sun or 0))
+
+    @property
+    def available_energy(self):
+        return max(0, int(self.max_energy or 0) - int(self.used_energy or 0) - int(self.min_reserve_energy or 0))
+
+
+class StakingOrder(TimeStampedModel):
+    STATUS_CHOICES = [("pending", "待处理"), ("delegating", "委托中"), ("success", "已委托"), ("failed", "失败"), ("reclaiming", "回收中"), ("reclaimed", "已回收")]
+    order_no = models.CharField(max_length=64, unique=True)
+    energy_order = models.ForeignKey(EnergyOrder, null=True, blank=True, on_delete=models.SET_NULL, related_name="staking_orders")
+    account = models.ForeignKey(StakingAccount, null=True, blank=True, on_delete=models.SET_NULL, related_name="staking_orders")
+    receiver_address = models.CharField(max_length=64)
+    resource = models.CharField(max_length=20, default="ENERGY")
+    energy_amount = models.PositiveIntegerField(default=0)
+    delegate_balance_sun = models.BigIntegerField(default=0)
+    lock = models.BooleanField(default=False)
+    lock_period = models.PositiveIntegerField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    delegate_txid = models.CharField(max_length=128, blank=True, default="")
+    undelegate_txid = models.CharField(max_length=128, blank=True, default="")
+    expire_at = models.DateTimeField(null=True, blank=True)
+    raw_payload = models.JSONField(default=dict, blank=True)
+    error_message = models.TextField(blank=True, default="")
+
+
+class StakingTransaction(TimeStampedModel):
+    OPERATION_CHOICES = [("stake", "质押"), ("unstake", "解押"), ("delegate", "委托"), ("undelegate", "回收")]
+    account = models.ForeignKey(StakingAccount, null=True, blank=True, on_delete=models.SET_NULL, related_name="transactions")
+    staking_order = models.ForeignKey(StakingOrder, null=True, blank=True, on_delete=models.SET_NULL, related_name="transactions")
+    operation = models.CharField(max_length=20, choices=OPERATION_CHOICES)
+    resource = models.CharField(max_length=20, default="ENERGY")
+    amount_sun = models.BigIntegerField(default=0)
+    receiver_address = models.CharField(max_length=64, blank=True, default="")
+    permission_id = models.PositiveIntegerField(default=0)
+    signature_count = models.PositiveIntegerField(default=0)
+    txid = models.CharField(max_length=128, blank=True, default="")
+    status = models.CharField(max_length=20, default="built")
+    broadcast_result = models.JSONField(default=dict, blank=True)
+    raw_transaction = models.JSONField(default=dict, blank=True)
+    error_message = models.TextField(blank=True, default="")
