@@ -73,4 +73,10 @@ uv run python manage.py runserver 127.0.0.1:18001
 .venv/bin/python manage.py import_trx_legacy_sql .migration/source_trx_staking/TRX质押版本/shiyinengliang.sql --clear
 ```
 
-迁移说明见 `docs/trx_staking_migration.md`，执行日志见 `docs/migration_log.md`。
+迁移说明见 `docs/trx_staking_migration.md`，执行日志见 `docs/migration_log.md`，线上实测补充见 `docs/online_acceptance.md`。
+
+线上实测前可先检查缺失配置：
+
+```bash
+.venv/bin/python manage.py check_online_readiness
+```
