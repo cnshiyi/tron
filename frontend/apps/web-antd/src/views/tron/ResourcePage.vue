@@ -28,7 +28,7 @@ const bulkForm = reactive({ content: '', default_owner_user_id: '', webhook_enab
 
 const columns = computed(() => [
   ...config.value.columns.map((col) => ({ ...col, ellipsis: col.ellipsis ?? true })),
-  { title: t('common.action', '操作'), key: 'action', fixed: 'right', width: config.value.actions?.length ? 360 : 150 },
+  { title: t('common.action', '操作'), key: 'action', fixed: 'right' as const, width: config.value.actions?.length ? 360 : 150 },
 ]);
 
 function resetForm(record: Record<string, any> = {}) {

@@ -124,12 +124,26 @@ class StakingServiceTests(TestCase):
 
         self.assertTrue(result["ok"])
         order.refresh_from_db()
-        self.assertEqual(order.status, "delegating")
+        self.assertEqual(order.status, "success")
         self.assertEqual(order.platform_order_id, "staking:E1002")
         staking_order = StakingOrder.objects.get(order_no="E1002")
         self.assertEqual(staking_order.account, self.account)
-        self.assertEqual(staking_order.status, "delegating")
+        self.assertEqual(staking_order.status, "success")
+        self.assertIsNotNone(staking_order.expire_at)
         self.assertEqual(staking_order.delegate_balance_sun, 3_000_000)
+
+    def test_reclaim_order_rejects_pending_delegate(self):
+        staking_order = StakingOrder.objects.create(
+            order_no="E1002P",
+            account=self.account,
+            receiver_address="TReceiverAddresspending",
+            energy_amount=32_000,
+            delegate_balance_sun=3_000_000,
+            status="pending",
+        )
+
+        with self.assertRaisesMessage(ValueError, "只有已委托成功"):
+            TronStakingService(client=FakeClient()).reclaim_order(staking_order, broadcast=True)
 
     def test_reclaim_order_undelegates_and_releases_inventory(self):
         staking_order = StakingOrder.objects.create(

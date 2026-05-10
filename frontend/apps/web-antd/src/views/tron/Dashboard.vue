@@ -11,7 +11,7 @@ const report = ref<Record<string, any>>({ summary: {}, status: {}, daily: {}, to
 const textVersion = ref(0);
 const t = uiText;
 
-const cards = computed(() => {
+const cards = computed<Array<[string, string]>>(() => {
   textVersion.value;
   return [
   ['bots', t('dashboard.card.bots', '机器人')],
@@ -27,7 +27,7 @@ const cards = computed(() => {
 ];
 });
 
-const summaryCards = computed(() => {
+const summaryCards = computed<Array<[string, string]>>(() => {
   textVersion.value;
   return [
   ['exchange_amount', t('dashboard.summary.exchange_amount', '兑换成交金额')],

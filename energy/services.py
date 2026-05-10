@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal
 import re
 
@@ -243,10 +244,18 @@ class TronStakingService:
         result = self.delegate_resource(account, order.receiver_address, balance_sun, order.energy_amount, order.order_no, lock, lock_period, broadcast, staking_order)
         staking_order.delegate_txid = result.get("txid", "")
         staking_order.raw_payload = result
-        staking_order.status = ("delegating" if broadcast else "pending") if result.get("ok") else "failed"
+        if result.get("ok"):
+            staking_order.status = "success" if broadcast else "pending"
+            if broadcast:
+                staking_order.expire_at = timezone.now() + timedelta(hours=int(order.plan.duration_hours if order.plan else 1))
+        else:
+            staking_order.status = "failed"
         staking_order.error_message = result.get("error", "")
-        staking_order.save(update_fields=["delegate_txid", "raw_payload", "status", "error_message", "updated_at"])
-        order.status = ("delegating" if broadcast else order.status) if result.get("ok") else "failed"
+        staking_order.save(update_fields=["delegate_txid", "raw_payload", "status", "expire_at", "error_message", "updated_at"])
+        if result.get("ok"):
+            order.status = "success" if broadcast else order.status
+        else:
+            order.status = "failed"
         order.energy_txid = result.get("txid", order.energy_txid)
         order.platform_order_id = f"staking:{staking_order.order_no}"
         order.callback_payload = {**(order.callback_payload or {}), "staking_delegate": result}
@@ -254,6 +263,8 @@ class TronStakingService:
         return {**result, "staking_order_id": staking_order.id}
 
     def reclaim_order(self, staking_order: StakingOrder, broadcast: bool = False) -> dict:
+        if staking_order.status not in {"success", "reclaiming"}:
+            raise ValueError("只有已委托成功的质押订单可以回收")
         staking_order.status = "reclaiming"
         staking_order.save(update_fields=["status", "updated_at"])
         result = self.undelegate_resource(staking_order, broadcast=broadcast)
