@@ -75,8 +75,9 @@ uv run python manage.py runserver 127.0.0.1:18001
 
 迁移说明见 `docs/trx_staking_migration.md`，执行日志见 `docs/migration_log.md`，线上实测补充见 `docs/online_acceptance.md`。
 
-线上实测前可先检查缺失配置：
+线上实测前可先检查缺失配置。若不想使用域名，将 `TELEGRAM_DELIVERY_MODE=polling` 后运行轮询命令即可：
 
 ```bash
 .venv/bin/python manage.py check_online_readiness
+.venv/bin/python manage.py run_telegram_polling --once --dry-run
 ```

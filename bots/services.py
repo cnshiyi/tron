@@ -102,15 +102,7 @@ class TelegramBotService:
             )
         return user_obj, group_obj, chat_id, text
 
-    def handle_webhook(self, bot_id: str, raw_body: bytes) -> dict:
-        try:
-            update = json.loads(raw_body.decode("utf-8"))
-        except Exception as exc:
-            return {"ok": False, "error": f"invalid json: {exc}"}
-        bot = Bot.objects.filter(robot_id=bot_id, is_active=True, webhook_enabled=True).first()
-        if not bot:
-            return {"ok": False, "error": "bot not found or webhook disabled"}
-
+    def handle_update(self, bot: Bot, update: dict, force_dry_run: bool | None = None) -> dict:
         user_obj, group_obj, chat_id, text = self.upsert_user_and_group(bot, update)
         if user_obj and user_obj.is_blacklisted:
             return {"ok": True, "ignored": "blacklisted", "user_id": user_obj.user_id}
@@ -126,7 +118,7 @@ class TelegramBotService:
         reply_markup = self.build_reply_markup(bot)
         if chat_id:
             for item in replies:
-                result = self.send_message(bot, chat_id, item.content or item.title, reply_markup=reply_markup)
+                result = self.send_message(bot, chat_id, item.content or item.title, reply_markup=reply_markup, dry_run=force_dry_run)
                 sent.append({"promotion": item.id, "ok": result.ok, "message_id": result.message_id, "error": result.error})
         return {
             "ok": True,
@@ -138,6 +130,16 @@ class TelegramBotService:
             "sent": sent,
             "received_text": text,
         }
+
+    def handle_webhook(self, bot_id: str, raw_body: bytes) -> dict:
+        try:
+            update = json.loads(raw_body.decode("utf-8"))
+        except Exception as exc:
+            return {"ok": False, "error": f"invalid json: {exc}"}
+        bot = Bot.objects.filter(robot_id=bot_id, is_active=True, webhook_enabled=True).first()
+        if not bot:
+            return {"ok": False, "error": "bot not found or webhook disabled"}
+        return self.handle_update(bot, update)
 
     def broadcast(self, bot: Bot, content: str, title: str = "", chat_id: str = "", dry_run: bool = True) -> dict:
         targets = []
