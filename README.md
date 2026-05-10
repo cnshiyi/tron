@@ -11,6 +11,7 @@
 - membership：会员商品、会员订单
 - finance：余额、流水、提现审批
 - accounts：后台仪表盘 API
+- legacy：兼容 `TRX质押版本.rar` 的旧版 Jeecg `/game/tg*` 接口、SQL 导入和原始数据查看
 
 ## 本地启动
 
@@ -60,3 +61,16 @@ uv run python manage.py runserver 127.0.0.1:18001
 - `/api/energy/*` 能量业务
 - `/api/membership/*` 会员业务
 - `/api/finance/*` 财务业务
+- `/api/game/<resource>/<action>` 旧版 TRX 质押 Jeecg 接口兼容层
+- `/api/legacy/game-records/` 旧版 TRX 质押原始数据管理
+
+## TRX质押版本迁移
+
+已支持从下载目录 `TRX质押版本.rar` 解包出的旧 SQL 导入 27 个 `tg_` 业务表，并在前端提供 `/tron/legacy-game` 查看入口。
+
+```bash
+.venv/bin/python manage.py import_trx_legacy_sql .migration/source_trx_staking/TRX质押版本/shiyinengliang.sql --dry-run
+.venv/bin/python manage.py import_trx_legacy_sql .migration/source_trx_staking/TRX质押版本/shiyinengliang.sql --clear
+```
+
+迁移说明见 `docs/trx_staking_migration.md`，执行日志见 `docs/migration_log.md`。

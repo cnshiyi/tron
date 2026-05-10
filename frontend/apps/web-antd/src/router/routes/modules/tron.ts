@@ -9,6 +9,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { name: 'TronDashboard', path: '/tron/dashboard', component: () => import('#/views/tron/Dashboard.vue'), meta: { affixTab: true, icon: 'lucide:layout-dashboard', title: '控制台' } },
       { name: 'TronSettings', path: '/tron/settings', component: () => import('#/views/tron/Settings.vue'), meta: { icon: 'lucide:settings', title: '系统配置' } },
+      { name: 'TronLegacyGame', path: '/tron/legacy-game', component: () => import('#/views/tron/LegacyGame.vue'), meta: { icon: 'lucide:database-zap', title: '旧版TRX质押数据' } },
       { name: 'TronTextConfigs', path: '/tron/resource/textConfigs', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:languages', title: '文字配置' }, props: { resourceKey: 'textConfigs' } },
       { name: 'TronBots', path: '/tron/resource/bots', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:bot', title: '机器人管理' }, props: { resourceKey: 'bots' } },
       { name: 'TronPromotions', path: '/tron/resource/promotions', component: () => import('#/views/tron/ResourcePage.vue'), meta: { icon: 'lucide:megaphone', title: '推广文案' }, props: { resourceKey: 'promotions' } },

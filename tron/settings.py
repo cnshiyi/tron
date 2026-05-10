@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "finance",
     "tgusers",
     "configcenter",
+    "legacy",
 ]
 
 MIDDLEWARE = [
